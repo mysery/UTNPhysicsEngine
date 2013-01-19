@@ -237,13 +237,13 @@ namespace Examples.UTNPhysicsEngine.physics
             computeAMatrix(contacts, ncontacts, out amat, out notZero, out notZeroCols);
             computeBVector(contacts, ncontacts, out bvec);
             /* Solve for f j's */
-            NagLibrary.E04.e04nk(   ncontacts,
+            /*NagLibrary.E04.e04nk(   ncontacts,
                                     ncontacts,
                                     notZero,
                                     0,
                                     notZeroCols,
                                     new NagLibrary.E04.E04NK_QPHX(qphx),
-
+            */
 
 
             qpSolve(amat, bvec, ncontacts, out fvec); //problema cuadratrico.

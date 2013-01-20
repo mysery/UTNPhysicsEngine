@@ -77,6 +77,11 @@ namespace Examples.UTNPhysicsEngine.physics
             }
         }
 
+        internal void addBody(Body body)
+        {
+            _spatialHash.add(body.BoundingBox.aabbMin, body.BoundingBox.aabbMax, body);            
+        }
+
         internal void step(float timeStep)
         {
             int numSimulationSubSteps = 1;
@@ -164,13 +169,7 @@ namespace Examples.UTNPhysicsEngine.physics
 
                 //las coliciones con el mundo deben ser resultas tambien.
                 if (contactWorld != null)
-                    //    contacts.Add(contactWorld);
                     contacts.AddRange(contactWorld);
-                //if (!contacts.Add(contactWorld))
-                //    Logger.logInThread("El contacto con el mundo esta repetido.", Color.DarkRed);
-
-                //ArrayList nearList = _octreeRigidBodys.GetNode(bodyPivot.position.X + 100f, bodyPivot.position.X - 100f, bodyPivot.position.Y + 100f, bodyPivot.position.Y - 100f, bodyPivot.position.Z + 100f, bodyPivot.position.Z - 100f);//GetNodes(bodyPivot.position, worldSize);
-                //ArrayList nearList = _octree.GetChildsNodes(bodyPivot.position, bodyPivot.Radius*3);
                 SpatialHashAABB aabb = bodyPivot.BoundingBox;
                 ArrayList nearList = _spatialHash.getNeighbors(aabb.aabbMin, aabb.aabbMax);
                 foreach (Body bodyNear in nearList)
@@ -194,10 +193,13 @@ namespace Examples.UTNPhysicsEngine.physics
 
                 if (picking)
                 {
-                    List<Contact> contactPick = ContactBuilder.TestCollisionPick(bodyPivot,
-                                                                                pickingRay.Ray);
-                    if (contactPick != null)
-                        contacts.AddRange(contactPick);
+                    if ((bool)GuiController.Instance.Modifiers.getValue("rayImpulse"))
+                    {
+                        List<Contact> contactPick = ContactBuilder.TestCollisionPick(bodyPivot,
+                                                                                    pickingRay.Ray);
+                        if (contactPick != null)
+                            contacts.AddRange(contactPick);
+                    }
                 }
             }
             picking = false;
@@ -207,8 +209,7 @@ namespace Examples.UTNPhysicsEngine.physics
         {
             foreach (Contact c in contacts)
 			{
-                //Por el momento contactos en un solo punto. (TODO Mas ContactPoints)
-                ContactSolver.solveSimpleContact(c);                
+                ContactSolver.solveSimpleContact(c);
 			}
         }
     }

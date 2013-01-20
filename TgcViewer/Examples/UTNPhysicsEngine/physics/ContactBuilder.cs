@@ -66,7 +66,7 @@ namespace Examples.UTNPhysicsEngine.physics
             n.Normalize();
 
             List<Contact> resultList = new List<Contact>();
-            resultList.Add(new Contact(s, new RayBody(ray), -n * (int)GuiController.Instance.Modifiers.getValue("DireccionImpulso"), point, 0.01f));
+            resultList.Add(new Contact(s, new RayBody(ray), -n, point, 0.01f));
             return resultList;
         }
 

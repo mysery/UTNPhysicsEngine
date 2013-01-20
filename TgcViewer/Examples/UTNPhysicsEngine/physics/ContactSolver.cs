@@ -12,10 +12,43 @@ namespace Examples.UTNPhysicsEngine.physics
 
         internal static void solveSimpleContact(Contact c)
         {
-            if (c.bodyB is RayBody)
-                TgcViewer.Utils.Logger.logInThread("impulso ray", System.Drawing.Color.DarkGoldenrod);
-            //            if (c.insertionDistance <= 0)
-            //            {
+            Vector3 relPosA = c.positionContact - c.bodyA.CenterOfMassPosition;
+            Vector3 relPosB = c.positionContact - c.bodyB.CenterOfMassPosition;
+
+            //float normalImpulse = 0;
+
+            float relVel;
+            float velADotn = Vector3.Dot(c.normalContact, c.bodyA.velocity)
+                        + Vector3.Dot(Vector3.Cross(c.bodyA.angularVelocity, relPosA), c.normalContact);
+            //body->v + (body->omega criss (p - body->x));
+            float velBDotn = Vector3.Dot(c.normalContact, c.bodyB.velocity)
+                        + Vector3.Dot(Vector3.Cross(c.bodyB.angularVelocity, relPosB), c.normalContact);
+            relVel = velADotn - velBDotn;
+            if (relVel > EPSILON_FOR_IMPULSE)
+                return; //Se esta alejando ya, si se le aplica nuevaente el impulso hace que los cuerpos se aceleren.
+            if (relVel > -EPSILON_FOR_IMPULSE)
+                return; //Caso de penetracion, hay que realizar "resting contact" problema cuadratico.
+
+            float numerator = -(1 + c.combinedRestitution) * relVel;
+            float denom = c.bodyA.InverseMass + c.bodyB.InverseMass
+                        + Vector3.Dot(c.normalContact, Vector3.Cross(Vector3.TransformNormal(Vector3.Cross(relPosA, c.normalContact), c.bodyA.invInertiaTensor), relPosA))
+                        + Vector3.Dot(c.normalContact, Vector3.Cross(Vector3.TransformNormal(Vector3.Cross(relPosB, c.normalContact), c.bodyB.invInertiaTensor), relPosB));
+
+            float impulseMagnitude = numerator / denom;
+
+            if (c.bodyA.InverseMass != 0)
+            {
+                c.bodyA.ApplyImpulse(relPosA, c.normalContact, impulseMagnitude);
+            }
+            if (c.bodyB.InverseMass != 0)
+            {
+                c.bodyB.ApplyImpulse(relPosB, c.normalContact, -impulseMagnitude);
+            }
+        }
+
+        //DEPRECADO, no lo uso porque trae errores.
+        internal static void solveSimpleFrictionContact(Contact c)
+        {
             Vector3 relPosA = c.positionContact - c.bodyA.CenterOfMassPosition;
             Vector3 relPosB = c.positionContact - c.bodyB.CenterOfMassPosition;
 
@@ -33,95 +66,51 @@ namespace Examples.UTNPhysicsEngine.physics
             if (relVel > -EPSILON_FOR_IMPULSE)
                 return; //Caso de penetracion, hay que realizar "resting contact" rigid body II
 
-            float numerator = -(1 + c.combinedRestitution) * relVel;
-            float denom = c.bodyA.InverseMass + c.bodyB.InverseMass
-                        + Vector3.Dot(c.normalContact, Vector3.Cross(Vector3.TransformNormal(Vector3.Cross(relPosA, c.normalContact), c.bodyA.invInertiaTensor), relPosA))
-                        + Vector3.Dot(c.normalContact, Vector3.Cross(Vector3.TransformNormal(Vector3.Cross(relPosB, c.normalContact), c.bodyB.invInertiaTensor), relPosB));
+            //////////////// FRCICION ///////////////
+            Vector3 frictionTangentialA = new Vector3(), frictionTangentialB = new Vector3();
+            PlaneSpace1(c.normalContact, ref frictionTangentialA, ref frictionTangentialB);
+            float relaxation = relVel * c.combinedFriction;
+            float limit = c.combinedFriction; //impulseMagnitude * c.combinedFriction
 
-            float impulseMagnitude = numerator / denom;
+            float denomFricctionA = c.bodyA.InverseMass + c.bodyB.InverseMass
+                                        + Vector3.Dot(c.normalContact, Vector3.Cross(Vector3.TransformNormal(Vector3.Cross(relPosA, frictionTangentialA), c.bodyA.invInertiaTensor), relPosA))
+                                        + Vector3.Dot(c.normalContact, Vector3.Cross(Vector3.TransformNormal(Vector3.Cross(relPosB, frictionTangentialA), c.bodyB.invInertiaTensor), relPosB));
+            float impulseFictionA = relaxation / (denomFricctionA); //impulse frictional
+
+            if (limit < impulseFictionA)
+                impulseFictionA = limit;
+            if (impulseFictionA < -limit)
+                impulseFictionA = -limit;
 
             if (c.bodyA.InverseMass != 0)
             {
-                c.bodyA.ApplyImpulse(relPosA, c.normalContact, impulseMagnitude);
+                c.bodyA.ApplyImpulse(relPosA, frictionTangentialA, impulseFictionA);
             }
             if (c.bodyB.InverseMass != 0)
             {
-                c.bodyB.ApplyImpulse(relPosB, c.normalContact, -impulseMagnitude);
+                c.bodyB.ApplyImpulse(relPosB, frictionTangentialA, -impulseFictionA);
             }
-            /*
-                            //////////////// FRCICION ///////////////
-                            Vector3 frictionTangentialA = new Vector3(), frictionTangentialB = new Vector3();
-                            PlaneSpace1(c.normalContact, ref frictionTangentialA, ref frictionTangentialB);
-                            float relaxation = relVel * c.combinedFriction;
-                            float limit = impulseMagnitude * c.combinedFriction;
-                
-                            float denomFricctionA = c.bodyA.InverseMass + c.bodyB.InverseMass
-                                                       + Vector3.Dot(c.normalContact, Vector3.Cross(Vector3.TransformNormal(Vector3.Cross(relPosA, frictionTangentialA), c.bodyA.invInertiaTensor), relPosA))
-                                                       + Vector3.Dot(c.normalContact, Vector3.Cross(Vector3.TransformNormal(Vector3.Cross(relPosB, frictionTangentialA), c.bodyB.invInertiaTensor), relPosB));
-                            float impulseFictionA = relaxation / (denomFricctionA); //impulse frictional
 
-                            if (limit < impulseFictionA)
-                                impulseFictionA = limit;
-                            if (impulseFictionA < -limit)
-                                impulseFictionA = -limit;
 
-                            if (c.bodyA.InverseMass != 0)
-                            {
-                                c.bodyA.ApplyImpulse(relPosA, frictionTangentialA, impulseFictionA);
-                            }
-                            if (c.bodyB.InverseMass != 0)
-                            {
-                                c.bodyB.ApplyImpulse(relPosB, frictionTangentialA, -impulseFictionA);
-                            }
-                
+            float denomFricctionB = c.bodyA.InverseMass + c.bodyB.InverseMass
+                                        + Vector3.Dot(c.normalContact, Vector3.Cross(Vector3.TransformNormal(Vector3.Cross(relPosA, frictionTangentialB), c.bodyA.invInertiaTensor), relPosA))
+                                        + Vector3.Dot(c.normalContact, Vector3.Cross(Vector3.TransformNormal(Vector3.Cross(relPosB, frictionTangentialB), c.bodyB.invInertiaTensor), relPosB));
+            float impulseFictionB = relaxation / (denomFricctionB); //impulse frictional
 
-                            float denomFricctionB = c.bodyA.InverseMass + c.bodyB.InverseMass
-                                                       + Vector3.Dot(c.normalContact, Vector3.Cross(Vector3.TransformNormal(Vector3.Cross(relPosA, frictionTangentialB), c.bodyA.invInertiaTensor), relPosA))
-                                                       + Vector3.Dot(c.normalContact, Vector3.Cross(Vector3.TransformNormal(Vector3.Cross(relPosB, frictionTangentialB), c.bodyB.invInertiaTensor), relPosB));
-                            float impulseFictionB = relaxation / (denomFricctionB); //impulse frictional
+            //limit = (impulseMagnitude+impulseFictionA) * c.combinedFriction;
+            if (limit < impulseFictionB)
+                impulseFictionB = limit;
+            if (impulseFictionA < -limit)
+                impulseFictionB = -limit;
 
-                            //limit = (impulseMagnitude+impulseFictionA) * c.combinedFriction;
-                            if (limit < impulseFictionB)
-                                impulseFictionB = limit;
-                            if (impulseFictionA < -limit)
-                                impulseFictionB = -limit;
-
-                            if (c.bodyA.InverseMass != 0)
-                            {
-                                c.bodyA.ApplyImpulse(relPosA, frictionTangentialB, impulseFictionB);
-                            }
-                            if (c.bodyB.InverseMass != 0)
-                            {
-                                c.bodyB.ApplyImpulse(relPosB, frictionTangentialB, -impulseFictionB);
-                            }
-            */
-
-            /*
-    //---  u_n_after = u_n_before+ N^T K N j_n
-    //---  u_n_after = - eps u_n_before
-    //---  =>
-    //---  - eps u_n_before - u_n_before = N^T K N j_n
-    //---  - (1+eps) u_n_before / N^T K N =  j_n
-        
-    Vector3 u_a = Vector3.Cross(c.bodyA.angularVelocity, relPosA) + c.bodyA.velocity;
-    Vector3 u_b = Vector3.Cross(c.bodyB.angularVelocity, relPosB) + c.bodyB.velocity;
-    Vector3 u	= (u_b - u_a);
-
-    float u_before = Vector3.Dot(u, c.normalContact);
-//        if(EPSILON_FOR_IMPULSE >= u_before)
-//          return ;
-        
-    Matrix K = compute_collision_matrix(c.bodyA.InverseMass,c.bodyA.invInertiaTensor,relPosA,c.bodyB.InverseMass,c.bodyB.invInertiaTensor,relPosB);
-    Vector3 J = new Vector3(K.M11 * c.normalContact.X+K.M12 * c.normalContact.Y+K.M13 * c.normalContact.Z,
-                            K.M21 * c.normalContact.X+K.M22 * c.normalContact.Y+K.M23 * c.normalContact.Z,
-                            K.M31 * c.normalContact.X+K.M32 * c.normalContact.Y+K.M33 * c.normalContact.Z);
-    float nKn = Vector3.Dot(c.normalContact, J);
-    float minus_1_en_u_before = -(1 + c.combinedRestitution)*u_before;
-    //J = c.normalContact*(minus_1_en_u_before/nKn);
-    float impulseMagnitude = -(minus_1_en_u_before / nKn);
-             Validado!!! da lo mismo que estoy haciendo.
-            */
-            //            }
+            if (c.bodyA.InverseMass != 0)
+            {
+                c.bodyA.ApplyImpulse(relPosA, frictionTangentialB, impulseFictionB);
+            }
+            if (c.bodyB.InverseMass != 0)
+            {
+                c.bodyB.ApplyImpulse(relPosB, frictionTangentialB, -impulseFictionB);
+            }
         }
 
         internal const float Sqrt12 = 0.7071067811865475244008443621048490f;
@@ -279,14 +268,14 @@ namespace Examples.UTNPhysicsEngine.physics
             //      matrix h is not referenced explicitly.)
             //
             double two = 2.00e+0;
-            
+
             for (int i = 0; i < ncolh; i++)
             {
                 for (int j = 0; j < ncolh; j++)
                 {
                     hx[i] += two * amat[j, i] * x[i]; // es por dos por la api que tiene esto.
                 }
-            }           
+            }
         }
 
 
@@ -362,7 +351,7 @@ namespace Examples.UTNPhysicsEngine.physics
                     hasNonZero = false;
                 }
 
-            }            
+            }
         }
 
         private static float compute_aij(Contact ci, Contact cj)

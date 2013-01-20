@@ -340,6 +340,15 @@ namespace TgcViewer.Utils.TgcGeometry
             return v1 > v2 ? v1 : v2;
         }
 
+        public static float clamp(float p, float min, float max)
+        {
+            if (p >= min && p <= max)
+                return p;
+            else if (p < min)
+                return min;
+            else
+                return max;
+        }
 
         #endregion
 
@@ -357,9 +366,15 @@ namespace TgcViewer.Utils.TgcGeometry
             return new Vector3(v1.X/f1, v1.Y/f1, v1.Z/f1);
         }
 
+        public static Vector3 clampVector(Vector3 vector, float min, float max)
+        {
+            return new Vector3( FastMath.clamp(vector.X, min, max),
+                                FastMath.clamp(vector.Y, min, max),
+                                FastMath.clamp(vector.Z, min, max));
+        }
 
+        
         #endregion
-
     }
 
     

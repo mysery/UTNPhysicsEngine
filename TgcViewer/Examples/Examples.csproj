@@ -84,10 +84,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\WINDOWS\Microsoft.NET\Managed DirectX\v9.05.132\Microsoft.DirectX.DirectSound.dll</HintPath>
     </Reference>
-    <Reference Include="Naglibrary32, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5b3c2ab9ec29ceba, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Archivos de programa\NAG\NAG Library for .NET\Naglibrary32.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />

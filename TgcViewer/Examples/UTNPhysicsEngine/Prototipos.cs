@@ -77,12 +77,10 @@ namespace Examples
             GuiController.Instance.FpsCamera.setCamera(new Vector3(-WorldSize, WorldSize, -WorldSize), new Vector3(WorldSize, -WorldSize, WorldSize));
 
             GuiController.Instance.Modifiers.addBoolean("pause", "Pause Simulation", true);
-            GuiController.Instance.Modifiers.addBoolean("debug", "Muestra objetos de debug", false);
+            GuiController.Instance.Modifiers.addBoolean("debug", "Muestra objetos para debug", false);
             GuiController.Instance.Modifiers.addFloat("timeSteps",0.25f, 10f, 1f);
-            GuiController.Instance.Modifiers.addInt("DireccionImpulso", -1, 1, 0);
-            //GuiController.Instance.Modifiers.addBoolean("debugMode", "Debug Mode", false);
-            //GuiController.Instance.Modifiers.addBoolean("colisionDetect", "Deteccion de colisiones", true);
-            //GuiController.Instance.Modifiers.addBoolean("applyPhysics", "Calculos fisicos", true);
+            GuiController.Instance.Modifiers.addBoolean("rayImpulse", "Aplica un impulso al cuerpo", true);
+            GuiController.Instance.Modifiers.addBoolean("addBody", "Agrega un cuerpo segun las definiciones", false);
 
             //Materials.
             sphereMat[0].Ambient = Color.DarkRed;
@@ -114,12 +112,33 @@ namespace Examples
             box.AutoTransformEnable = false;            
         }
 
+        private TgcPickingRay pickingRay = new TgcPickingRay();
+
         public void render(float elapsedTime)
         {
             if (!(bool)GuiController.Instance.Modifiers.getValue("pause"))
             {
                 //compute: integrate position, collition detect, contacts solvers
-                world.step(elapsedTime);                
+                world.step(elapsedTime);
+
+                if (    GuiController.Instance.D3dInput.buttonPressed(TgcViewer.Utils.Input.TgcD3dInput.MouseButtons.BUTTON_RIGHT) &&
+                        (bool)GuiController.Instance.Modifiers.getValue("addBody"))
+                {
+                    pickingRay.updateRay();
+                    float radius = 10f;
+
+                    Vector3 pos =  FastMath.clampVector(pickingRay.Ray.Origin, -worldSize + 2 * radius, worldSize - 2 * radius);
+                    
+                    
+                    SphereBody sphereLeft = new SphereBody(radius,
+                                                            pos,
+                                                            pickingRay.Ray.Direction * 50f,
+                                                            new Vector3(0.0f, -9.8f, 0.0f),
+                                                            radius/FastMath.TWO_PI);
+                    this.Bodys.Add(sphereLeft);
+                    this.world.addBody(sphereLeft);
+                }
+                
             }
             int i = 0;
             d3dDevice.RenderState.Lighting = true;

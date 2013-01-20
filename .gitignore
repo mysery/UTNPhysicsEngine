@@ -108,3 +108,6 @@ Backup*/
 UpgradeLog*.XML
 /TgcViewer/Examples/Examples.dll
 /TgcViewer/Examples/TgcViewer.exe
+/TgcViewer/Examples/Ionic.Zip.dll
+/TgcViewer/TgcViewer.exe
+/TgcViewer/TgcViewer.exe.config

@@ -237,12 +237,19 @@ namespace Examples.UTNPhysicsEngine.physics
             computeAMatrix(contacts, ncontacts, out amat, out notZero, out notZeroCols);
             computeBVector(contacts, ncontacts, out bvec);
             /* Solve for f j's */
-            /*NagLibrary.E04.e04nk(   ncontacts,
-                                    ncontacts,
-                                    notZero,
-                                    0,
+            //formula de lib q+cTx+1/2*xT*Hx para esto no hay componente lineal. c=0
+            /*NagLibrary.E04.e04nq(   "C",
+                                    new NagLibrary.E04.E04NQ_QPHX(qphx), //hessiano.
+                                    ncontacts,//m
+                                    ncontacts,//n
+                                    notZero, //no cero n
+                                    1,//defuult
+                                    0, //c componente lineal.
                                     notZeroCols,
-                                    new NagLibrary.E04.E04NK_QPHX(qphx),
+                                    0,// c rows
+                                    0, //q
+                                    "",
+                                    ????? que parametro es este!!!!!
             */
 
 
@@ -265,7 +272,7 @@ namespace Examples.UTNPhysicsEngine.physics
             }
         }
 
-        public static void qphx(int nstate, int ncolh, double[] x, double[] hx)
+        public static void qphx(int ncolh, double[] x, double[] hx, int nstate)
         {
             //
             //      Routine to compute H*x. (In this version of QPHX, the Hessian

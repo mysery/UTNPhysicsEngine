@@ -10,7 +10,7 @@ namespace Examples.UTNPhysicsEngine.physics
     {
         private static float EPSILON_FOR_IMPULSE = 0.001f;
 
-        internal static void solveSimpleContact(Contact c)
+        internal static void solveSimpleContact(Contact c, float timeStep)
         {
             Vector3 relPosA = c.positionContact - c.bodyA.CenterOfMassPosition;
             Vector3 relPosB = c.positionContact - c.bodyB.CenterOfMassPosition;
@@ -26,8 +26,8 @@ namespace Examples.UTNPhysicsEngine.physics
             relVel = velADotn - velBDotn;
             if (relVel > EPSILON_FOR_IMPULSE)
                 return; //Se esta alejando ya, si se le aplica nuevaente el impulso hace que los cuerpos se aceleren.
-            if (relVel > -EPSILON_FOR_IMPULSE)
-                return; //Caso de penetracion, hay que realizar "resting contact" problema cuadratico.
+//            if (relVel > -EPSILON_FOR_IMPULSE)
+//                return; //Caso de penetracion, hay que realizar "resting contact" problema cuadratico.
 
             float numerator = -(1 + c.combinedRestitution) * relVel;
             float denom = c.bodyA.InverseMass + c.bodyB.InverseMass
@@ -36,13 +36,21 @@ namespace Examples.UTNPhysicsEngine.physics
 
             float impulseMagnitude = numerator / denom;
 
+            float penVel = -c.insertionDistance / timeStep;
+            float penetrationImpulse = 0;
+            if (numerator < penVel)
+            {
+                penetrationImpulse = c.penetration / denom;
+            }
+            float fixedImpulse = penetrationImpulse + impulseMagnitude;
+
             if (c.bodyA.InverseMass != 0)
             {
-                c.bodyA.ApplyImpulse(relPosA, c.normalContact, impulseMagnitude);
+                c.bodyA.ApplyImpulse(relPosA, c.normalContact, fixedImpulse);
             }
             if (c.bodyB.InverseMass != 0)
             {
-                c.bodyB.ApplyImpulse(relPosB, c.normalContact, -impulseMagnitude);
+                c.bodyB.ApplyImpulse(relPosB, c.normalContact, -fixedImpulse);
             }
         }
 

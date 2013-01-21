@@ -209,7 +209,7 @@ namespace Examples.UTNPhysicsEngine.physics
         {
             foreach (Contact c in contacts)
 			{
-                ContactSolver.solveSimpleContact(c);
+                ContactSolver.solveSimpleContact(c, timeStep);
 			}
         }
     }

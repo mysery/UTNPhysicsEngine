@@ -97,6 +97,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="UTNPhysicsEngine\Constant.cs" />
     <Compile Include="UTNPhysicsEngine\Ejemplo10.cs" />
     <Compile Include="UTNPhysicsEngine\Ejemplo0.cs" />
     <Compile Include="UTNPhysicsEngine\Ejemplo8.cs" />

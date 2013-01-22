@@ -86,7 +86,7 @@ namespace Examples.UTNPhysicsEngine.physics
         {
             int numSimulationSubSteps = 1;
             localTime += timeStep;
-            float fixedTime = FIXED_TIME_STEP * (float)GuiController.Instance.Modifiers.getValue("timeSteps");
+            float fixedTime = FIXED_TIME_STEP * (float)GuiController.Instance.Modifiers.getValue(Constant.timeSteps);
             if (localTime >= fixedTime)
             {
                 numSimulationSubSteps = (int)(localTime / fixedTime);
@@ -193,7 +193,7 @@ namespace Examples.UTNPhysicsEngine.physics
 
                 if (picking)
                 {
-                    if ((bool)GuiController.Instance.Modifiers.getValue("rayImpulse"))
+                    if ((bool)GuiController.Instance.Modifiers.getValue(Constant.rayImpulse))
                     {
                         List<Contact> contactPick = ContactBuilder.TestCollisionPick(bodyPivot,
                                                                                     pickingRay.Ray);

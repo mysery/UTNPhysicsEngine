@@ -76,11 +76,17 @@ namespace Examples
             GuiController.Instance.FpsCamera.JumpSpeed = 150f;
             GuiController.Instance.FpsCamera.setCamera(new Vector3(-WorldSize, WorldSize, -WorldSize), new Vector3(WorldSize, -WorldSize, WorldSize));
 
-            GuiController.Instance.Modifiers.addBoolean("pause", "Pause Simulation", true);
-            GuiController.Instance.Modifiers.addBoolean("debug", "Muestra objetos para debug", false);
-            GuiController.Instance.Modifiers.addFloat("timeSteps",0.25f, 10f, 1f);
-            GuiController.Instance.Modifiers.addBoolean("rayImpulse", "Aplica un impulso al cuerpo", true);
-            GuiController.Instance.Modifiers.addBoolean("addBody", "Agrega un cuerpo segun las definiciones", false);
+            GuiController.Instance.Modifiers.addBoolean(Constant.pause, Constant.pause_text, true);
+            GuiController.Instance.Modifiers.addBoolean(Constant.debug, Constant.debug_text, false);
+            GuiController.Instance.Modifiers.addFloat(Constant.timeSteps ,0.25f, 10f, 1f);
+            GuiController.Instance.Modifiers.addBoolean(Constant.rayImpulse, Constant.rayImpulse_text, true);
+            GuiController.Instance.Modifiers.addBoolean(Constant.addMode, Constant.addMode_text, false);
+            GuiController.Instance.Modifiers.addFloat(Constant.radio, 1f, 100f, 20f);
+            GuiController.Instance.Modifiers.addFloat(Constant.initVel, 0f, 200f, 50f);
+            GuiController.Instance.Modifiers.addBoolean(Constant.gravity, Constant.gravity_text, true);
+            GuiController.Instance.Modifiers.addVertex3f(Constant.acceleration, new Vector3(-10f, -10f, -10f), new Vector3(10f, 10f, 10f), new Vector3());
+            GuiController.Instance.Modifiers.addFloat(Constant.mass, 0f, 10f, 1f);
+            GuiController.Instance.Modifiers.addFloat(Constant.restitution, 0.1f, 1f, 1f);
 
             //Materials.
             sphereMat[0].Ambient = Color.DarkRed;
@@ -106,7 +112,7 @@ namespace Examples
         public void createMesh() 
         {
             // sphere
-            sphere = Mesh.Sphere(d3dDevice, 1f, 10, 10);
+            sphere = Mesh.Sphere(d3dDevice, 1f, 15, 15);
 
             box = TgcBox.fromSize(new Vector3(1f, 1f, 1f),Color.DarkRed);
             box.AutoTransformEnable = false;            
@@ -116,25 +122,31 @@ namespace Examples
 
         public void render(float elapsedTime)
         {
-            if (!(bool)GuiController.Instance.Modifiers.getValue("pause"))
+            if (!(bool)GuiController.Instance.Modifiers.getValue(Constant.pause))
             {
                 //compute: integrate position, collition detect, contacts solvers
                 world.step(elapsedTime);
 
                 if (    GuiController.Instance.D3dInput.buttonPressed(TgcViewer.Utils.Input.TgcD3dInput.MouseButtons.BUTTON_RIGHT) &&
-                        (bool)GuiController.Instance.Modifiers.getValue("addBody"))
+                        (bool)GuiController.Instance.Modifiers.getValue(Constant.addMode))
                 {
                     pickingRay.updateRay();
-                    float radius = 10f;
+                    float radius = (float)GuiController.Instance.Modifiers.getValue(Constant.radio);
 
                     Vector3 pos =  FastMath.clampVector(pickingRay.Ray.Origin, -worldSize + 2 * radius, worldSize - 2 * radius);
                     
+                    Vector3 acc = (Vector3)GuiController.Instance.Modifiers.getValue(Constant.acceleration);
+                    if ((bool)GuiController.Instance.Modifiers.getValue(Constant.gravity))
+                    {
+                        acc.Add(new Vector3(0.0f, -9.8f, 0.0f));
+                    }
                     
                     SphereBody sphereLeft = new SphereBody(radius,
                                                             pos,
-                                                            pickingRay.Ray.Direction * 50f,
-                                                            new Vector3(0.0f, -9.8f, 0.0f),
-                                                            radius/FastMath.TWO_PI);
+                                                            pickingRay.Ray.Direction * (float)GuiController.Instance.Modifiers.getValue(Constant.initVel),
+                                                            acc,
+                                                            (float)GuiController.Instance.Modifiers.getValue(Constant.mass));
+                    sphereLeft.restitution = (float)GuiController.Instance.Modifiers.getValue(Constant.restitution);
                     this.Bodys.Add(sphereLeft);
                     this.world.addBody(sphereLeft);
                 }

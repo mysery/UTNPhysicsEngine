@@ -40,11 +40,11 @@ namespace Examples
             const float radius = 20.0f;
 
             Random r = new Random(123456);
-            for (int i = 0; i < 9; ++i)
+            for (int i = 0; i < 7; ++i)
 	        {
-		        for (int j = 0; j < 9; j++)
+		        for (int j = 0; j < 7; j++)
 		        {
-                    for (int k = 0; k < 9; k++)
+                    for (int k = 0; k < 7; k++)
                     {
                         SphereBody sphereLeft = new SphereBody( radius,
                                                                 new Vector3(-proto.WorldSize / 2 + i * radius * 4 + r.Next(2), -proto.WorldSize / 2 + j * radius * 4 + r.Next(2), -proto.WorldSize / 2 + k * radius * 4 + r.Next(2)),

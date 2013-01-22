@@ -273,7 +273,7 @@ namespace  Examples.UTNPhysicsEngine.optimizacion.octree
         private int renderCount = 0;
         public void render()
         {
-            if (!(bool)TgcViewer.GuiController.Instance.Modifiers.getValue("debug"))
+            if (!(bool)TgcViewer.GuiController.Instance.Modifiers.getValue(Constant.debug))
             {
                 top.render();
             }

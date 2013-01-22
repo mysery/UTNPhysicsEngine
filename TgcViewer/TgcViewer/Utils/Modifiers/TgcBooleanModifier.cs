@@ -19,6 +19,7 @@ namespace TgcViewer.Utils.Modifiers
             checkbox = new CheckBox();
             checkbox.Checked = defaultValue;
             checkbox.Text = text;
+            checkbox.AutoSize = true;
             checkbox.Margin = new Padding(0);
 
             contentPanel.Controls.Add(checkbox);

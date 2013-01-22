@@ -37,7 +37,7 @@ namespace Examples
 
         public void createBodys()
         {
-            const float radius = 1.0f;
+/*            const float radius = 1.0f;
             for (int i = 0; i < 6; i++)
             {
                 SphereBody sphereLeft = new SphereBody(radius,
@@ -47,7 +47,7 @@ namespace Examples
                                                                    1f);
                 proto.Bodys.Add(sphereLeft);
             }
-                    
+*/                    
         }
 
         public override void init()

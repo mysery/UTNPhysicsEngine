@@ -107,10 +107,11 @@ namespace Examples.UTNPhysicsEngine.physics
         {
             foreach (Body body in bodys)
             {
-                if (body.mass.Equals(0f))
+                if (body.mass.Equals(0f) || float.IsNaN(body.velocity.X))
                 {
                     continue;
                 }
+                
                 body.integrateForceSI(timeStep);                
             }
         }
@@ -119,7 +120,7 @@ namespace Examples.UTNPhysicsEngine.physics
         {
             foreach (Body body in bodys)
             {
-                if (body.mass.Equals(0f))
+                if (body.mass.Equals(0f) || float.IsNaN(body.velocity.X))
                 {
                     continue;
                 }
@@ -127,6 +128,7 @@ namespace Examples.UTNPhysicsEngine.physics
                     
                 SpatialHashAABB oldAabb = body.BoundingBox;
                 body.integrateVelocitySI(timeStep);
+                body.position = FastMath.clampVector(body.position, -worldSize, worldSize);
                 SpatialHashAABB newAabb = body.BoundingBox;
                 _spatialHash.update(oldAabb, newAabb, body);
                 //_spatialHash.add(newAabb.aabbMin, newAabb.aabbMax, body);
@@ -159,16 +161,16 @@ namespace Examples.UTNPhysicsEngine.physics
 
             foreach (Body bodyPivot in bodys)
             {
-                if (bodyPivot.mass.Equals(0f))
+                if (bodyPivot.mass.Equals(0f) || float.IsNaN(bodyPivot.velocity.X))
                 {
                     continue;
                 }
-                
+
                 List<Contact> contactWorld = ContactBuilder.TestCollisionWorld(bodyPivot,
                                                                      planesLimits);
 
                 //las coliciones con el mundo deben ser resultas tambien.
-                if (contactWorld != null)
+                //if (contactWorld != null)
                     contacts.AddRange(contactWorld);
                 SpatialHashAABB aabb = bodyPivot.BoundingBox;
                 ArrayList nearList = _spatialHash.getNeighbors(aabb.aabbMin, aabb.aabbMax);

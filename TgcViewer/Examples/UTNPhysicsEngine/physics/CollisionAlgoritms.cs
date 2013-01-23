@@ -33,9 +33,13 @@ namespace Examples.UTNPhysicsEngine.physics
             insertionDistance = Vector3.Dot(s.Center, p.Normal) - FastMath.Abs(p.D);
             // If sphere center within +/-radius from plane, plane intersects sphere
             insertionDistance = FastMath.Abs(insertionDistance);
-            if (insertionDistance <= s.Radius)
+            if (insertionDistance <= s.Radius + s.margin)
+            {
+                insertionDistance -= s.Radius - s.margin;
                 return true;
-            return insertionDistance <= s.Radius;
+            }
+            else
+                return false;
         }
 
         private static bool testCollision(PlaneBody p, SphereBody s, out float insertionDistance)

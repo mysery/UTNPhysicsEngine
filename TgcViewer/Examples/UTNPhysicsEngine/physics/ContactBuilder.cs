@@ -14,17 +14,18 @@ namespace Examples.UTNPhysicsEngine.physics
     {
         internal static List<Contact> TestCollisionWorld(Body bodyPivot, PlaneBody[] worldLimits) //por el momento las interacciones con el mundo no tienen fisica aplicada (elastico puro)
         {
+            List<Contact> resultList = new List<Contact>();
             for (int i = 0; i < worldLimits.Length; i++)
             {
                 float insertionDistance;
                 if (CollisionAlgoritms.testCollision(bodyPivot, worldLimits[i], out insertionDistance))
                 {
                     //en este caso no deberiamos crear contact solvers para planos, que seria una simplifaciacion y no cambiar el body directo.
-                    return buildContact(bodyPivot, worldLimits[i], insertionDistance);
+                    resultList.AddRange(buildContact(bodyPivot, worldLimits[i], insertionDistance));
                 }
             }
 
-            return null;
+            return resultList;
         }
 
         internal static List<Contact> TestCollision(Body bodyPivot, Body bodyNear)
@@ -80,10 +81,10 @@ namespace Examples.UTNPhysicsEngine.physics
 
         private static List<Contact> buildContact(SphereBody body, PlaneBody plane, float insertionDistance)
         {
-            float dist = insertionDistance - (body.radius);
+            //float dist = insertionDistance - (body.radius);
             Vector3 positionContact = body.position - body.radius * plane.Normal;
             List<Contact> resultList = new List<Contact>();
-            resultList.Add(new Contact(body, plane, -plane.Normal, positionContact, dist));
+            resultList.Add(new Contact(body, plane, -plane.Normal, positionContact, insertionDistance));
             return resultList;
            
 /*            

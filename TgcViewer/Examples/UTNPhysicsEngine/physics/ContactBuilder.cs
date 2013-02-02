@@ -82,7 +82,7 @@ namespace Examples.UTNPhysicsEngine.physics
         private static List<Contact> buildContact(SphereBody body, PlaneBody plane, float insertionDistance)
         {
             //float dist = insertionDistance - (body.radius);
-            Vector3 positionContact = body.position - body.radius * plane.Normal;
+            Vector3 positionContact = body.position + body.radius * plane.Normal;
             List<Contact> resultList = new List<Contact>();
             resultList.Add(new Contact(body, plane, -plane.Normal, positionContact, insertionDistance));
             return resultList;
@@ -117,17 +117,19 @@ namespace Examples.UTNPhysicsEngine.physics
         }
 
         private static List<Contact> buildContact(SphereBody s1, SphereBody s2, float insertionDistance)
-        {/*
+        {
             //insertionDistance viene al cuadrado por optimizacion de la colision.
             float insertionDistanceSqrt = FastMath.Sqrt(insertionDistance);
-            //Si dist es negativo significa que se metieron adentro.
+            //Si dist es negativo significa que se metieron adentro. (siempre se meten un poquito)
             float dist = insertionDistanceSqrt - (s1.radius + s2.radius);
             Vector3 normalContactOnSurface = FastMath.divVector(s1.position - s2.position, insertionDistanceSqrt);
 
             Vector3 positionContactS1 = s1.position - s1.radius * normalContactOnSurface; //no es necesario calcular con un contacto alcanza.
             //Vector3 positionContactS2 = s2.position + s2.radius * normalContactOnSurface;
-            return new Contact(s1, s2, normalContactOnSurface, positionContactS1, dist);
-            */
+            List<Contact> resultList = new List<Contact>();
+            resultList.Add(new Contact(s1, s2, normalContactOnSurface, positionContactS1, dist));
+            return resultList;
+            /*
             //--- The contact normal is simply the normalized vector between
             //--- the sphere centers.
             //real_type squared_radius_sum = radius_sum*radius_sum;
@@ -148,20 +150,20 @@ namespace Examples.UTNPhysicsEngine.physics
             //---    d = |cB-cA| = dA + dB
             //---
             //---        dA = dB (rA/rB)
-            //---   dB + dA = dB + dB (rA/rB)   /*  add dB to both sides */
-            //---         d = dB(1+rA/rB)       /*  use d=dA+dB          */
+            //---   dB + dA = dB + dB (rA/rB)   // add dB to both sides 
+            //---         d = dB(1+rA/rB)       //  use d=dA+dB          
             //---
             //---        dB = d/(1+rA/rB)
-            //---      d-dA = d/(1+rA/rB)       /*  use d=dA+dB          */
+            //---      d-dA = d/(1+rA/rB)       //  use d=dA+dB          
             //---        dA = d - d/(1+rA/rB)
             //---
             float dB = (length / ((s1.radius / s2.radius) + 1.0f));
             float dA = length - dB;
             float distance = length - (s1.radius + s2.radius);
-            Vector3 p = n * dA + s1.position;
+            Vector3 p = s1.position + n * dA;
             List<Contact> resultList = new List<Contact>();
             resultList.Add(new Contact(s1, s2, n, p, distance));
-            return resultList;
+            return resultList;*/
         }
 
         private static List<Contact> buildContact(BoxBody b, SphereBody s, float insertionDistance)

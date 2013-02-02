@@ -68,13 +68,14 @@ namespace Examples.UTNPhysicsEngine.physics
             this.updatePostionDistance = FastMath.Pow2( worldSize / 10 );
         }
 
+        
         internal void optimize()
         {
             foreach (Body body in bodys)
             {
                 //_octree.AddNode(body.position, body, body.BoundingBox);
                 _spatialHash.add(body.BoundingBox.aabbMin, body.BoundingBox.aabbMax, body);
-            }
+            }            
         }
 
         internal void addBody(Body body)
@@ -211,8 +212,19 @@ namespace Examples.UTNPhysicsEngine.physics
         {
             foreach (Contact c in contacts)
 			{
+                if ((bool)TgcViewer.GuiController.Instance.Modifiers.getValue(Constant.debug))
+                {
+                    debugContacts.Add(c);
+                }
+                else
+                {
+                    debugContacts.Clear();
+                }
+
                 ContactSolver.solveSimpleContact(c, timeStep);
 			}
         }
+
+        public ArrayList debugContacts = new ArrayList(2000);
     }
 }

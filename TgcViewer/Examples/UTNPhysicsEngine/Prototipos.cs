@@ -33,6 +33,8 @@ namespace Examples
         private Material[] sphereMat = new Material[6];
         private TgcBoundingBox limitsWorld;
         private float worldSize = 500f;
+        private int renderContactCount = 0;
+        private TgcArrow debugContactArrow;
 
         public float WorldSize
         {
@@ -107,6 +109,8 @@ namespace Examples
             sphereMat[5].Ambient = Color.DarkViolet;
             sphereMat[5].Diffuse = Color.Violet;
             sphereMat[5].Specular = Color.White;
+
+            debugContactArrow = TgcArrow.fromExtremes(new Vector3(), TgcArrow.ORIGINAL_DIR*5f, Color.Red, Color.Red, 0.1f, new Vector2(0.3f, 0.6f));
         }
 
         public void createMesh() 
@@ -179,14 +183,32 @@ namespace Examples
             }
             d3dDevice.RenderState.Lighting = false;
             limitsWorld.render();
-            //world.Octree.render();
+            
+            //Debug del world:
+            if ((bool)TgcViewer.GuiController.Instance.Modifiers.getValue(Constant.debug))
+            {
+                foreach (Contact c in world.debugContacts)
+                {
+                    //Obtener matriz de rotacion respecto del vector de la linea
+                    Vector3 lineVec = c.normalContact;
+                    float angle = FastMath.Acos(Vector3.Dot(TgcArrow.ORIGINAL_DIR, lineVec));
+                    Vector3 axisRotation = Vector3.Cross(TgcArrow.ORIGINAL_DIR, lineVec);
+                    axisRotation.Normalize();
+                    debugContactArrow.transform = Matrix.RotationAxis(axisRotation, angle) * Matrix.Translation(c.positionContact);
+                    debugContactArrow.render();
+                }
+                if (world.debugContacts.Count > 2000)
+                {
+                    world.debugContacts.RemoveRange(0, 100);
+                }
+            }
         }
 
         public void close()
         {
             limitsWorld.dispose();
             sphere.Dispose();
-            //world.Octree.dispose();
+            debugContactArrow.dispose();
         }
 
 

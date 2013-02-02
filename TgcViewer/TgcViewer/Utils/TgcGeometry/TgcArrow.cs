@@ -95,7 +95,7 @@ namespace TgcViewer.Utils.TgcGeometry
         #endregion
 
 
-        readonly Vector3 ORIGINAL_DIR = new Vector3(0, 1, 0);
+        public static readonly Vector3 ORIGINAL_DIR = new Vector3(0, 1, 0);
 
         VertexBuffer vertexBuffer;
 
@@ -333,12 +333,14 @@ namespace TgcViewer.Utils.TgcGeometry
 
             texturesManager.clear(0);
             d3dDevice.Material = TgcD3dDevice.DEFAULT_MATERIAL;
-            d3dDevice.Transform.World = Matrix.Identity;
+            d3dDevice.Transform.World = transform;
 
             d3dDevice.VertexFormat = CustomVertex.PositionColored.Format;
             d3dDevice.SetStreamSource(0, vertexBuffer, 0);
             d3dDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 18);
         }
+
+        public Matrix transform = Matrix.Identity;
 
         /// <summary>
         /// Liberar recursos de la flecha

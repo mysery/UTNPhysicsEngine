@@ -60,7 +60,7 @@ namespace Examples
                                                                     yLocation,
                                                                     initialZ + (z * ((radius * 2) + separationBetweenSpheres))),
                                                         new Vector3(),
-                                                        new Vector3(0.0f, -5.0f, 0.0f),
+                                                        new Vector3(),
                                                         1.0f);
                     proto.Bodys.Add(sp1);
                 }

@@ -31,13 +31,17 @@ namespace Examples.UTNPhysicsEngine.physics
         private const int MAX_STEPS = 50;
         private const float FIXED_TIME_STEP = 1f / 60f;
         private float localTime = FIXED_TIME_STEP;
-
+        
         private List<Body> bodys;
         private float worldSize;
         //private ISet<Contact> contacts = new HashSet<Contact>(new ContactComparer());
         private ArrayList contacts = new ArrayList();//<Contact>();//new ContactComparer());
         private PlaneBody[] planesLimits = new PlaneBody[6];
         private TgcPickingRay pickingRay;
+
+        public float timeSteps = 1f;
+        public bool debugMode = false;
+        public bool applyRay = false;
 
         public World(List<Body> bodys, float worldSize)
         {
@@ -87,7 +91,7 @@ namespace Examples.UTNPhysicsEngine.physics
         {
             int numSimulationSubSteps = 1;
             localTime += timeStep;
-            float fixedTime = FIXED_TIME_STEP * (float)GuiController.Instance.Modifiers.getValue(Constant.timeSteps);
+            float fixedTime = FIXED_TIME_STEP * timeSteps;
             if (localTime >= fixedTime)
             {
                 numSimulationSubSteps = (int)(localTime / fixedTime);
@@ -196,7 +200,7 @@ namespace Examples.UTNPhysicsEngine.physics
 
                 if (picking)
                 {
-                    if ((bool)GuiController.Instance.Modifiers.getValue(Constant.rayImpulse))
+                    if (applyRay)
                     {
                         List<Contact> contactPick = ContactBuilder.TestCollisionPick(bodyPivot,
                                                                                     pickingRay.Ray);
@@ -212,7 +216,7 @@ namespace Examples.UTNPhysicsEngine.physics
         {
             foreach (Contact c in contacts)
 			{
-                if ((bool)TgcViewer.GuiController.Instance.Modifiers.getValue(Constant.debug))
+                if (debugMode)
                 {
                     debugContacts.Add(c);
                 }

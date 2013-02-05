@@ -126,6 +126,10 @@ namespace Examples
 
         public void render(float elapsedTime)
         {
+            world.applyRay = (bool)GuiController.Instance.Modifiers.getValue(Constant.rayImpulse);
+            world.debugMode = (bool)GuiController.Instance.Modifiers.getValue(Constant.debug);
+            world.timeSteps = (float)GuiController.Instance.Modifiers.getValue(Constant.timeSteps);
+
             if (!(bool)GuiController.Instance.Modifiers.getValue(Constant.pause))
             {
                 //compute: integrate position, collition detect, contacts solvers
@@ -140,16 +144,13 @@ namespace Examples
                     Vector3 pos =  FastMath.clampVector(pickingRay.Ray.Origin, -worldSize + 2 * radius, worldSize - 2 * radius);
                     
                     Vector3 acc = (Vector3)GuiController.Instance.Modifiers.getValue(Constant.acceleration);
-                    if ((bool)GuiController.Instance.Modifiers.getValue(Constant.gravity))
-                    {
-                        acc.Add(new Vector3(0.0f, -9.8f, 0.0f));
-                    }
                     
                     SphereBody sphereLeft = new SphereBody(radius,
                                                             pos,
                                                             pickingRay.Ray.Direction * (float)GuiController.Instance.Modifiers.getValue(Constant.initVel),
                                                             acc,
-                                                            (float)GuiController.Instance.Modifiers.getValue(Constant.mass));
+                                                            (float)GuiController.Instance.Modifiers.getValue(Constant.mass),
+                                                            (bool)GuiController.Instance.Modifiers.getValue(Constant.gravity));
                     sphereLeft.restitution = (float)GuiController.Instance.Modifiers.getValue(Constant.restitution);
                     this.Bodys.Add(sphereLeft);
                     this.world.addBody(sphereLeft);

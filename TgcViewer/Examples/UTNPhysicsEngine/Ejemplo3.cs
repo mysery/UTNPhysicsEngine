@@ -51,8 +51,8 @@ namespace Examples
                                                                 new Vector3(-proto.WorldSize / 2 + i * radius * 4 , -proto.WorldSize / 2 + j * radius * 4 , -proto.WorldSize / 2 + k * radius * 4),
                                                                 new Vector3(),
                                                                 //new Vector3((float)r.Next(-2, 2), (float)r.Next(-2, 2), (float)r.Next(-2, 2)),
-                                                                new Vector3(0.0f, -9.8f, 0.0f),
-                                                                1f * radius/FastMath.TWO_PI);
+                                                                new Vector3(),
+                                                                1f * radius);                        
                         proto.Bodys.Add(sphereLeft);
                     }
                }

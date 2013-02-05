@@ -50,7 +50,7 @@ namespace Examples
                                                                 new Vector3(-proto.WorldSize / 2 + i * radius[i] * 4 + r.Next(2), -proto.WorldSize / 2 + j * radius[i] * 4 + r.Next(2), -proto.WorldSize / 2 + k * radius[i] * 4 + r.Next(2)),
                                                                 new Vector3(),
                                                                 //new Vector3((float)r.Next(-2, 2), (float)r.Next(-2, 2), (float)r.Next(-2, 2)),
-                                                                new Vector3(0.0f, -9.8f, 0.0f),
+                                                                new Vector3(),
                                                                 1f);
                         proto.Bodys.Add(sphereLeft);
                     }

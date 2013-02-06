@@ -108,6 +108,8 @@
     <Compile Include="UTNPhysicsEngine\Ejemplo3.cs" />
     <Compile Include="UTNPhysicsEngine\math\CordinateSystem.cs" />
     <Compile Include="UTNPhysicsEngine\math\MathCordHelper.cs" />
+    <Compile Include="UTNPhysicsEngine\matias\EjemploMatias.cs" />
+    <Compile Include="UTNPhysicsEngine\matias\TgcSphere.cs" />
     <Compile Include="UTNPhysicsEngine\optimizacion\octree\FastSerialization.cs" />
     <Compile Include="UTNPhysicsEngine\optimizacion\octree\IOctree.cs" />
     <Compile Include="UTNPhysicsEngine\optimizacion\octree\Octree.cs" />

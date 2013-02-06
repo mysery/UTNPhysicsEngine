@@ -83,11 +83,7 @@ namespace Examples.Shaders
             activateAlphaBlend();
 
             //Cargar valores de shader de matrices que dependen de la posición del mesh
-            Matrix matWorldView = this.transform * device.Transform.View;
-            Matrix matWorldViewProj = matWorldView * device.Transform.Projection;
-            effect.SetValue("matWorld", this.transform);
-            effect.SetValue("matWorldView", matWorldView);
-            effect.SetValue("matWorldViewProj", matWorldViewProj);
+            setShaderMatrix(this.effect, this.transform);
 
             //Renderizar segun el tipo de render de la malla
             int numPasses;
@@ -154,7 +150,7 @@ namespace Examples.Shaders
                             device.Material = materials[i];
                             
                             //Setear textura en shader
-                            texturesManager.shaderSet(effect, "diffuseMap_Tex", diffuseMaps[i]);
+                            texturesManager.shaderSet(effect, "texDiffuseMap", diffuseMaps[i]);
 
                             //Iniciar pasada de shader
                             // guarda: Todos los SetValue tienen que ir ANTES del beginPass.
@@ -181,7 +177,23 @@ namespace Examples.Shaders
 
         }
 
+        /// <summary>
+        /// Cargar todas la matrices generales que necesita el shader
+        /// </summary>
+        private void setShaderMatrix(Effect effect, Matrix world)
+        {
+            Device device = GuiController.Instance.D3dDevice;
+
+            Matrix matWorldView = world * device.Transform.View;
+            Matrix matWorldViewProj = matWorldView * device.Transform.Projection;
+            effect.SetValue("matWorld", world);
+            effect.SetValue("matWorldView", matWorldView);
+            effect.SetValue("matWorldViewProj", matWorldViewProj);
+            effect.SetValue("matInverseTransposeWorld", Matrix.TransposeMatrix(Matrix.Invert(world)));
+        }
+
     }
+
 
     /// <summary>
     /// Factory customizado para poder crear clase TgcMeshShader

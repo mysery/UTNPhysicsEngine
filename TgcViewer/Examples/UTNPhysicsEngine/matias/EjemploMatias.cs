@@ -154,10 +154,10 @@ namespace Examples.UTNPhysicsEngine.matias
                 //Parametros de esfera
                 Vector3 position = cameraPos;
                 Vector3 velocity = Vector3.Normalize(cameraLookAt - cameraPos) * 10;
-                Vector3 acceleration = new Vector3(0, 0, 0);
+                Vector3 acceleration = new Vector3();// por default es la gravedad. (0.0f, -9.8f, 0.0f)*masa;
 
                 //Crear cuerpo de esfera
-                sphereElement.body = new SphereBody(sphereElement.type.radius, position, velocity, acceleration, sphereElement.type.mass, true);
+                sphereElement.body = new SphereBody(sphereElement.type.radius, position, velocity, acceleration, sphereElement.type.mass);//no hace falta el true, tiene valor default.
                 sphereElement.body.restitution = sphereElement.type.restitution;
 
                 

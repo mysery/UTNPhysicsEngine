@@ -30,6 +30,7 @@ namespace Examples.UTNPhysicsEngine.matias
         SphereType[] sphereTypes;
         TgcBox lightMesh;
         int currentType = 0;
+        List<TgcMeshShader> meshesEscenario;
 
 
         public override string getCategory()
@@ -54,7 +55,7 @@ namespace Examples.UTNPhysicsEngine.matias
 
             //World
             this.bodys = new List<Body>();
-            float worldSize = 500f;
+            float worldSize = 300f;
             this.world = new World(this.bodys, worldSize);
             this.limitsWorld = new TgcBoundingBox(new Vector3(-worldSize, -worldSize, -worldSize), new Vector3(worldSize, worldSize, worldSize));
             world.optimize();
@@ -67,6 +68,20 @@ namespace Examples.UTNPhysicsEngine.matias
             {
                 throw new Exception("Error al cargar shader: " + shaderPath + ". Errores: " + compilationErrors);
             }
+
+
+            //Cargar escenario
+            TgcSceneLoader loaderEscenario = new TgcSceneLoader();
+            loaderEscenario.MeshFactory = new CustomMeshShaderFactory();
+            TgcScene scene = loaderEscenario.loadSceneFromFile(GuiController.Instance.ExamplesMediaDir + "CanchaBasket\\CanchaBasket-TgcScene.xml");
+            this.meshesEscenario = new List<TgcMeshShader>();
+            foreach (TgcMeshShader m in scene.Meshes)
+            {
+                m.Effect = effectSphere;
+                this.meshesEscenario.Add(m);
+            }
+
+
 
             //Crear tipos de meshes de esfera
             sphereElements = new List<SphereElement>();
@@ -82,7 +97,7 @@ namespace Examples.UTNPhysicsEngine.matias
             sphereType.mesh.Effect = effectSphere;
             sphereType.radius = 20f;
             sphereType.mass = 20f;
-            sphereType.restitution = 1f;
+            sphereType.restitution = 0.8f;
             sphereTypes[0] = sphereType;
 
             //Tennis
@@ -92,7 +107,7 @@ namespace Examples.UTNPhysicsEngine.matias
             sphereType.mesh.Effect = effectSphere;
             sphereType.radius = 5f;
             sphereType.mass = 5f;
-            sphereType.restitution = 1f;
+            sphereType.restitution = 0.9f;
             sphereTypes[1] = sphereType;
 
             //Soccer
@@ -102,7 +117,7 @@ namespace Examples.UTNPhysicsEngine.matias
             sphereType.mesh.Effect = effectSphere;
             sphereType.radius = 16f;
             sphereType.mass = 16f;
-            sphereType.restitution = 1f;
+            sphereType.restitution = 0.7f;
             sphereTypes[2] = sphereType;
             
 
@@ -115,7 +130,7 @@ namespace Examples.UTNPhysicsEngine.matias
 
 
             //Mesh para la luz
-            lightMesh = TgcBox.fromSize(new Vector3(10, 10, 10), Color.Red);
+            lightMesh = TgcBox.fromSize(new Vector3(0, 250, 0), new Vector3(10, 10, 10), Color.Red);
 
         }
 
@@ -137,15 +152,9 @@ namespace Examples.UTNPhysicsEngine.matias
                 sphereElement.type = sphereTypes[++currentType % sphereTypes.Length];
 
                 //Parametros de esfera
-<<<<<<< .mine
                 Vector3 position = cameraPos;
                 Vector3 velocity = Vector3.Normalize(cameraLookAt - cameraPos) * 10;
                 Vector3 acceleration = new Vector3(0, 0, 0);
-=======
-                Vector3 position = cameraPos;
-                Vector3 velocity = Vector3.Normalize(cameraLookAt - cameraPos) * 10;
-                Vector3 acceleration = new Vector3(0.0f, -9.8f, 0.0f);
->>>>>>> .theirs
 
                 //Crear cuerpo de esfera
                 sphereElement.body = new SphereBody(sphereElement.type.radius, position, velocity, acceleration, sphereElement.type.mass, true);
@@ -164,22 +173,20 @@ namespace Examples.UTNPhysicsEngine.matias
 
 
             //Cargar variables shader de la luz
-            Vector3 lightPos = new Vector3(0, 100, 0);
-            lightMesh.Position = lightPos;
             effectSphere.SetValue("lightColor", ColorValue.FromColor(Color.White));
-            effectSphere.SetValue("lightPosition", TgcParserUtils.vector3ToFloat4Array(lightPos));
+            effectSphere.SetValue("lightPosition", TgcParserUtils.vector3ToFloat4Array(lightMesh.Position));
             effectSphere.SetValue("lightIntensity", 20f);
-            effectSphere.SetValue("lightAttenuation", 0.3f);
+            effectSphere.SetValue("lightAttenuation", 0.2f);
 
             //Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
             effectSphere.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
             effectSphere.SetValue("materialAmbientColor", ColorValue.FromColor(Color.White));
             effectSphere.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.White));
             effectSphere.SetValue("materialSpecularColor", ColorValue.FromColor(Color.White));
-            effectSphere.SetValue("materialSpecularExp", 9f);
+            effectSphere.SetValue("materialSpecularExp", 20f);
 
 
-            //Render
+            //Render balas
             foreach (SphereElement sphereElement in this.sphereElements)
             {
                 //Aplicar transformacion al mesh
@@ -191,6 +198,13 @@ namespace Examples.UTNPhysicsEngine.matias
 
             }
 
+
+
+            //Render escenario
+            foreach (TgcMeshShader mesh in this.meshesEscenario)
+            {
+                mesh.render();
+            }
 
             //Renderizar mesh de luz
             lightMesh.render();
@@ -204,6 +218,14 @@ namespace Examples.UTNPhysicsEngine.matias
         {
             limitsWorld.dispose();
             lightMesh.dispose();
+            foreach (TgcMeshShader mesh in this.meshesEscenario)
+            {
+                mesh.dispose();
+            }
+            foreach (SphereType t in this.sphereTypes)
+            {
+                t.mesh.dispose();
+            }
         }
 
 

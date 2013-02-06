@@ -62,7 +62,7 @@ namespace Examples
                                                                     yLocation + random.Next(maxValueRandom),
                                                                     initialZ + (z * ((radius * 2) + separationBetweenSpheres))),
                                                         new Vector3(),
-                                                        new Vector3(0.0f, -9.8f, 0.0f),
+                                                        new Vector3(),
                                                         1.0f);
                     
                     proto.Bodys.Add(sphere);

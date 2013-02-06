@@ -115,7 +115,7 @@ namespace Examples
 
             float mass = densityValue * (1.33333f) * FastMath.PI * (radius * radius * radius);
             
-            SphereBody sphere = new SphereBody(radius, initialLocation, initialVelocity, new Vector3(), mass);
+            SphereBody sphere = new SphereBody(radius, initialLocation, initialVelocity, new Vector3(), mass, false);
             proto.Bodys.Add(sphere);            
         }
 

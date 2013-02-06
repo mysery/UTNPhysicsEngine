@@ -49,7 +49,7 @@ namespace Examples
                         SphereBody sphereLeft = new SphereBody( radius,
                                                                 new Vector3(-proto.WorldSize / 2 + i * radius * 4, -proto.WorldSize / 2 + j * radius * 4, -proto.WorldSize / 2 + k * radius * 4),
                                                                 new Vector3((float)r.Next(-5, 5), (float)r.Next(-5, 5), (float)r.Next(-5, 5)),
-                                                                new Vector3(0.0f, -9.8f, 0.0f),
+                                                                new Vector3(),
                                                                 /*(float)r.NextDouble() * 5*/1f);
                         proto.Bodys.Add(sphereLeft);
                     }

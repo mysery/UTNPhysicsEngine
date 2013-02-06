@@ -137,9 +137,15 @@ namespace Examples.UTNPhysicsEngine.matias
                 sphereElement.type = sphereTypes[++currentType % sphereTypes.Length];
 
                 //Parametros de esfera
+<<<<<<< .mine
                 Vector3 position = cameraPos;
                 Vector3 velocity = Vector3.Normalize(cameraLookAt - cameraPos) * 10;
                 Vector3 acceleration = new Vector3(0, 0, 0);
+=======
+                Vector3 position = cameraPos;
+                Vector3 velocity = Vector3.Normalize(cameraLookAt - cameraPos) * 10;
+                Vector3 acceleration = new Vector3(0.0f, -9.8f, 0.0f);
+>>>>>>> .theirs
 
                 //Crear cuerpo de esfera
                 sphereElement.body = new SphereBody(sphereElement.type.radius, position, velocity, acceleration, sphereElement.type.mass, true);

@@ -80,8 +80,8 @@ namespace Examples.UTNPhysicsEngine.matias
             sphereType.mesh = (TgcMeshShader)loader.loadSceneFromFile(GuiController.Instance.ExamplesMediaDir + "Balls\\Basketball\\Basketball-TgcScene.xml").Meshes[0];
             sphereType.mesh.AutoTransformEnable = false;
             sphereType.mesh.Effect = effectSphere;
-            sphereType.radius = 10f;
-            sphereType.mass = 10f;
+            sphereType.radius = 20f;
+            sphereType.mass = 20f;
             sphereType.restitution = 1f;
             sphereTypes[0] = sphereType;
 
@@ -90,8 +90,8 @@ namespace Examples.UTNPhysicsEngine.matias
             sphereType.mesh = (TgcMeshShader)loader.loadSceneFromFile(GuiController.Instance.ExamplesMediaDir + "Balls\\Tennis\\Tennis-TgcScene.xml").Meshes[0];
             sphereType.mesh.AutoTransformEnable = false;
             sphereType.mesh.Effect = effectSphere;
-            sphereType.radius = 4f;
-            sphereType.mass = 4f;
+            sphereType.radius = 5f;
+            sphereType.mass = 5f;
             sphereType.restitution = 1f;
             sphereTypes[1] = sphereType;
 
@@ -100,8 +100,8 @@ namespace Examples.UTNPhysicsEngine.matias
             sphereType.mesh = (TgcMeshShader)loader.loadSceneFromFile(GuiController.Instance.ExamplesMediaDir + "Balls\\Soccer\\Soccer-TgcScene.xml").Meshes[0];
             sphereType.mesh.AutoTransformEnable = false;
             sphereType.mesh.Effect = effectSphere;
-            sphereType.radius = 8f;
-            sphereType.mass = 8f;
+            sphereType.radius = 16f;
+            sphereType.mass = 16f;
             sphereType.restitution = 1f;
             sphereTypes[2] = sphereType;
             
@@ -117,18 +117,15 @@ namespace Examples.UTNPhysicsEngine.matias
             //Mesh para la luz
             lightMesh = TgcBox.fromSize(new Vector3(10, 10, 10), Color.Red);
 
-
-
-            GuiController.Instance.Modifiers.addBoolean(Constant.debug, Constant.debug_text, false);
-            GuiController.Instance.Modifiers.addFloat(Constant.timeSteps, 0.25f, 10f, 1f);
-            GuiController.Instance.Modifiers.addBoolean(Constant.rayImpulse, Constant.rayImpulse_text, true);
-
         }
 
         public override void render(float elapsedTime)
         {
             //compute: integrate position, collition detect, contacts solvers
             world.step(elapsedTime);
+
+            Vector3 cameraPos = GuiController.Instance.FpsCamera.getPosition();
+            Vector3 cameraLookAt = GuiController.Instance.FpsCamera.getLookAt();
 
             //Agregar nueva esfera
             if (GuiController.Instance.D3dInput.buttonPressed(TgcD3dInput.MouseButtons.BUTTON_RIGHT))
@@ -140,12 +137,12 @@ namespace Examples.UTNPhysicsEngine.matias
                 sphereElement.type = sphereTypes[++currentType % sphereTypes.Length];
 
                 //Parametros de esfera
-                Vector3 position = GuiController.Instance.FpsCamera.getPosition();
-                Vector3 velocity = new Vector3(0, 0, 10);
-                Vector3 acceleration = new Vector3(0.0f, -9.8f, 0.0f);
+                Vector3 position = cameraPos;
+                Vector3 velocity = Vector3.Normalize(cameraLookAt - cameraPos) * 10;
+                Vector3 acceleration = new Vector3(0, 0, 0);
 
                 //Crear cuerpo de esfera
-                sphereElement.body = new SphereBody(sphereElement.type.radius, position, velocity, acceleration, sphereElement.type.mass);
+                sphereElement.body = new SphereBody(sphereElement.type.radius, position, velocity, acceleration, sphereElement.type.mass, true);
                 sphereElement.body.restitution = sphereElement.type.restitution;
 
                 

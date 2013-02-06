@@ -24,7 +24,7 @@ namespace Examples.UTNPhysicsEngine.physics.body
         private Matrix _Ibody; //Inertia tensor del cuerpo constante durante lo que vive el cuerpo, para las rotaciones.
         private Matrix _InvIbody; //Inversa de inertia tensor del cuerpo constante durante lo que vive el cuerpo, para las rotaciones.
         private float _restitution = 0.9f;
-        public float friction = 0.1f;//TODO, verificar buenas constantes de friccion y resitucion.
+        public float friction = 0.3f;//TODO, verificar buenas constantes de friccion y resitucion.
 
         /* estado */
         public Vector3 position;
@@ -96,7 +96,7 @@ namespace Examples.UTNPhysicsEngine.physics.body
                                                     this.invInertiaTensor.M31 * this.torque.X + this.invInertiaTensor.M32 * this.torque.Y + this.invInertiaTensor.M33 * this.torque.Z) * timeStep);*/
         }
 
-        internal void integrateVelocitySI(float timeStep)
+        public virtual void integrateVelocitySI(float timeStep)
         {
             this.position.Add(Vector3.Multiply(this.velocity, timeStep));
             

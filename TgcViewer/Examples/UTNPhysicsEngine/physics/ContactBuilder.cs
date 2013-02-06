@@ -236,24 +236,34 @@ namespace Examples.UTNPhysicsEngine.physics
             //--- no need for storing a normal for each contact point.
 
             //--- Now find three other corners of the box by going along the edges meeting at the clostest point.
-            CordinateSystem boxCoords = box.wordCordSys();
-            Vector3 localPoint = boxCoords.toLocalCoordsPoint(p);
-            //localPoint = Vector3.TransformCoordinate(localPoint, box.direction);
+            //CordinateSystem boxCoords = box.wordCordSys();
+            //Vector3 localPoint = boxCoords.toLocalCoordsPoint(p);
+            //Vector3 localPoint = p - box.position;
             Vector3 b;
-            b.X = 1f * a.X * delta.X;
-            b.Y = 1f * a.Y * delta.Y;
-            b.Z = 1f * a.Z * delta.Z;
-            Vector3 bt = Vector3.TransformCoordinate(b, Matrix.Identity*box.direction);
+            b.X = -2f * a.X * delta.X;
+            b.Y = -2f * a.Y * delta.Y;
+            b.Z = -2f * a.Z * delta.Z;
+            Vector3 bx = Vector3.TransformNormal(b, Matrix.TransposeMatrix(box.direction)*Matrix.RotationQuaternion(box.quaternion));
+            Vector3[] corner = {p + i*bx.X,
+                                p + j*bx.Y,
+                                p + k*bx.Z};
+            Vector3[] corner2 = {   i*bx.X - p,
+                                    j*bx.Y - p,
+                                    k*bx.Z - p};
+            /*Vector3 bt = Vector3.TransformCoordinate(b, Matrix.Identity*box.direction);
             Vector3[] corner = {new Vector3(localPoint.X + bt.X, localPoint.Y, localPoint.Z),
                                 new Vector3(localPoint.X, localPoint.Y + bt.Y, localPoint.Z),
                                 new Vector3(localPoint.X, localPoint.Y, localPoint.Z + bt.Z)};
-
+            */
             //--- Pick the two corner points with smallest signed distance, and
             //--- if distance below envelope add them as contacts.
-            float[] dist = {   FastMath.Abs( Vector3.Dot(boxCoords.fromLocalCoordPoint(corner[0]),n) - w),//+ Vector3.Dot(plane.Normal, i)*box.extendend.X
-                               FastMath.Abs( Vector3.Dot(boxCoords.fromLocalCoordPoint(corner[1]),n) - w),
-                               FastMath.Abs( Vector3.Dot(boxCoords.fromLocalCoordPoint(corner[2]),n) - w)};
-
+            float[] dist = {   w - Vector3.Dot(corner[0],n) ,
+                               w - Vector3.Dot(corner[1],n) ,
+                               w - Vector3.Dot(corner[2],n)  };
+            float[] dist2 = {  Vector3.Dot(corner2[0],n) - w,
+                               Vector3.Dot(corner2[1],n) - w,
+                               Vector3.Dot(corner2[2],n) - w};
+            
             //--- Use insertion sort to find contacts with smallest distance
             int []permutation = {0,1,2};
             for(int s=1; s<3; ++s)
@@ -286,11 +296,11 @@ namespace Examples.UTNPhysicsEngine.physics
             //return new Contact(box, plane, -plane.Normal, positionContact, dist);
             */
             List<Contact> resultList = new List<Contact>();
-            resultList.Add(new Contact(box, plane, -n, boxCoords.fromLocalCoordPoint(corner[permutation[0]]), insertionDistance));
-            if (dist[permutation[1]] < box.margin + distance)
-                resultList.Add(new Contact(box, plane, -n, boxCoords.fromLocalCoordPoint(corner[permutation[1]]), insertionDistance));
-            if (dist[permutation[2]] < box.margin + distance)
-                resultList.Add(new Contact(box, plane, -n, boxCoords.fromLocalCoordPoint(corner[permutation[2]]), insertionDistance));
+            resultList.Add(new Contact(box, plane, -n, corner[permutation[0]], insertionDistance));
+            if (dist[permutation[1]] < box.margin)
+                resultList.Add(new Contact(box, plane, -n, corner[permutation[1]], dist[permutation[1]]));
+            if (dist[permutation[2]] < box.margin)
+                resultList.Add(new Contact(box, plane, -n, corner[permutation[2]], dist[permutation[2]]));
             //}
 /*            p[1] = corner[permutation[0]];
             distance[1] = dist[permutation[0]];

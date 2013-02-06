@@ -46,7 +46,7 @@ namespace Examples
             //m.M32 = -1f;
             BoxBody box = new BoxBody(m, halfExtend, new Vector3(), new Vector3(), new Vector3(0f, -0.1f, 0f), 1f);
             proto.Bodys.Add(box);
-            /*box = new BoxBody(m, halfExtend, new Vector3(100f, 0f, 100f), new Vector3(), new Vector3(0f, -0.1f, 0f), 1f);
+            box = new BoxBody(m, halfExtend, new Vector3(100f, 0f, 100f), new Vector3(), new Vector3(0f, -0.1f, 0f), 1f);
             proto.Bodys.Add(box);
             box = new BoxBody(m, halfExtend, new Vector3(-100f, 0f, -100f), new Vector3(), new Vector3(0f, -0.1f, 0f), 1f);
             proto.Bodys.Add(box);
@@ -57,31 +57,31 @@ namespace Examples
             box = new BoxBody(m, halfExtend, new Vector3(-100f, 0f, 100f), new Vector3(), new Vector3(0f, -0.1f, 0f), 1f);
             proto.Bodys.Add(box);
 
-            //m.M12 = 1f;
-            //m.M32 = -1f;
+            m.M12 = 1f;
+            m.M32 = -1f;
             halfExtend = new Vector3(20f, 20f, 20f);
             box = new BoxBody(m, halfExtend, new Vector3(200f, 0f, 200f), new Vector3(), new Vector3(0f, -0.1f, 0f), 1f);
             proto.Bodys.Add(box);
 
-            //m.M12 = 0f;
-            //m.M32 = 0f;
-            //m.M13 = 1f;
-            //m.M33 = 1f;
+            m.M12 = 0f;
+            m.M32 = 0f;
+            m.M13 = 1f;
+            m.M33 = 1f;
             box = new BoxBody(m, halfExtend, new Vector3(-200f, 0f, -200f), new Vector3(), new Vector3(0f, -0.1f, 0f), 1f);
             proto.Bodys.Add(box);
 
-            //m.M12 = -1f;
-            //m.M32 = -1f;
-            //m.M13 = -1f;
-            //m.M33 = -1f;
+            m.M12 = -1f;
+            m.M32 = -1f;
+            m.M13 = -1f;
+            m.M33 = -1f;
             box = new BoxBody(m, halfExtend, new Vector3(0f, 0f, -200f), new Vector3(), new Vector3(0f, -0.1f, 0f), 1f);
             proto.Bodys.Add(box);
 
-            //m.M11 = 0f;
-            //m.M22 = 0f;
-            //m.M33 = 0f;            
+            m.M11 = 0f;
+            m.M22 = 0f;
+            m.M33 = 0f;            
             box = new BoxBody(m, halfExtend, new Vector3(0f, 0f, 200f), new Vector3(), new Vector3(0f, -0.1f, 0f), 1f);
-            proto.Bodys.Add(box);*/
+            proto.Bodys.Add(box);
         }
 
 

@@ -197,9 +197,9 @@ namespace Examples
                     debugContactArrow.transform = Matrix.RotationAxis(axisRotation, angle) * Matrix.Translation(c.positionContact);
                     debugContactArrow.render();
                 }
-                if (world.debugContacts.Count > 2000)
+                if (world.debugContacts.Count > 1000)
                 {
-                    world.debugContacts.RemoveRange(0, 100);
+                    world.debugContacts.RemoveRange(0, world.debugContacts.Count/8);
                 }
             }
         }

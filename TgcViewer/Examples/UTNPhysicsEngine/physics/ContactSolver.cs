@@ -15,7 +15,7 @@ namespace Examples.UTNPhysicsEngine.physics
             Vector3 relPosA = c.positionContact - c.bodyA.CenterOfMassPosition;
             Vector3 relPosB = c.positionContact - c.bodyB.CenterOfMassPosition;
 
-            //float normalImpulse = 0;
+            //float normalImpulse = 0;            
 
             float relVel;
             float velADotn = Vector3.Dot(c.normalContact, c.bodyA.velocity)
@@ -52,6 +52,8 @@ namespace Examples.UTNPhysicsEngine.physics
             {
                 c.bodyB.ApplyImpulse(relPosB, c.normalContact, -fixedImpulse);
             }
+
+            
         }
 
         //DEPRECADO, no lo uso porque trae errores.

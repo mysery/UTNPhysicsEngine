@@ -11,14 +11,22 @@ namespace Examples.UTNPhysicsEngine.optimizacion.spatialHash
         public long cell_x;
         public long cell_y;
         public long cell_z;
-        public uint cellSize;
+        public Vector3 cellSize;
         
         public SpatialHashKey(uint cellSize, Vector3 point)
         {
+            this.cellSize = new Vector3(cellSize, cellSize, cellSize);
+            this.cell_x = (long)point.X / (long)this.cellSize.X;
+            this.cell_y = (long)point.Y / (long)this.cellSize.Y;
+            this.cell_z = (long)point.Z / (long)this.cellSize.Z;
+        }
+
+        public SpatialHashKey(Vector3 cellSize, Vector3 point)
+        {
             this.cellSize = cellSize;
-            this.cell_x = (long) point.X / this.cellSize;
-            this.cell_y = (long) point.Y / this.cellSize;
-            this.cell_z = (long) point.Z / this.cellSize;
+            this.cell_x = (long)point.X / (long)this.cellSize.X;
+            this.cell_y = (long) point.Y / (long)this.cellSize.Y;
+            this.cell_z = (long)point.Z / (long)this.cellSize.Z;
         }
 
         public SpatialHashKey(long cx, long cy, long cz)

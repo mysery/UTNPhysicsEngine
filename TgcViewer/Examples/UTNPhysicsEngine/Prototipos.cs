@@ -26,17 +26,16 @@ namespace Examples
             get { return bodys; }
             set { bodys = value; }
         }
-        private World world;
+        public World world;
         private Device d3dDevice;
         private Mesh sphere;
         private TgcBox box;
         private Material[] sphereMat = new Material[6];
-        private TgcBoundingBox limitsWorld;
-        private float worldSize = 500f;
-        private int renderContactCount = 0;
+        public TgcBoundingBox limitsWorld;
+        private Vector3 worldSize = new Vector3(500f, 500f, 500f);
         private TgcArrow debugContactArrow;
 
-        public float WorldSize
+        public Vector3 WorldSize
         {
             get { return worldSize; }
             set { worldSize = value; }
@@ -49,8 +48,8 @@ namespace Examples
             Bodys = new List<Body>();
             this.createMesh();
             this.world = new World(Bodys, WorldSize);
-            this.limitsWorld = new TgcBoundingBox(  new Vector3(-WorldSize, -WorldSize, -WorldSize),
-                                                    new Vector3(WorldSize, WorldSize, WorldSize));
+            this.limitsWorld = new TgcBoundingBox(  WorldSize*-1f,
+                                                    WorldSize);
             
             //Crear una fuente de luz direccional en la posición 0.
             d3dDevice.Lights[0].Type = LightType.Directional;
@@ -76,7 +75,7 @@ namespace Examples
             GuiController.Instance.FpsCamera.Enable = true;
             GuiController.Instance.FpsCamera.MovementSpeed = 150f;
             GuiController.Instance.FpsCamera.JumpSpeed = 150f;
-            GuiController.Instance.FpsCamera.setCamera(new Vector3(-WorldSize, WorldSize, -WorldSize), new Vector3(WorldSize, -WorldSize, WorldSize));
+            GuiController.Instance.FpsCamera.setCamera(new Vector3(-WorldSize.X, WorldSize.Y, -WorldSize.Z), new Vector3(WorldSize.X, -WorldSize.Y, WorldSize.Z));
 
             GuiController.Instance.Modifiers.addBoolean(Constant.pause, Constant.pause_text, true);
             GuiController.Instance.Modifiers.addBoolean(Constant.debug, Constant.debug_text, false);
@@ -140,8 +139,8 @@ namespace Examples
                 {
                     pickingRay.updateRay();
                     float radius = (float)GuiController.Instance.Modifiers.getValue(Constant.radio);
-
-                    Vector3 pos =  FastMath.clampVector(pickingRay.Ray.Origin, -worldSize + 2 * radius, worldSize - 2 * radius);
+                    Vector3 rV = new Vector3(radius, radius, radius)*2f;
+                    Vector3 pos = FastMath.clamp(pickingRay.Ray.Origin, -WorldSize + rV, worldSize - rV);
                     
                     Vector3 acc = (Vector3)GuiController.Instance.Modifiers.getValue(Constant.acceleration);
                     

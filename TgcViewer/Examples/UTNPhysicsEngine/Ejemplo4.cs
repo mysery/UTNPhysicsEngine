@@ -47,7 +47,7 @@ namespace Examples
                     for (int k = 0; k < 3; k++)
                     {
                         SphereBody sphereLeft = new SphereBody( radius[i],
-                                                                new Vector3(-proto.WorldSize / 2 + i * radius[i] * 4 + r.Next(2), -proto.WorldSize / 2 + j * radius[i] * 4 + r.Next(2), -proto.WorldSize / 2 + k * radius[i] * 4 + r.Next(2)),
+                                                                new Vector3(-proto.WorldSize.X / 2 + i * radius[i] * 4 + r.Next(2), -proto.WorldSize.Y / 2 + j * radius[i] * 4 + r.Next(2), -proto.WorldSize.Z / 2 + k * radius[i] * 4 + r.Next(2)),
                                                                 new Vector3(),
                                                                 //new Vector3((float)r.Next(-2, 2), (float)r.Next(-2, 2), (float)r.Next(-2, 2)),
                                                                 new Vector3(),

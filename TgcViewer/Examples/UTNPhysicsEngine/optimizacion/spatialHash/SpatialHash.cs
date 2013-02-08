@@ -8,13 +8,13 @@ using Examples.UTNPhysicsEngine.physics.body;
 
 namespace Examples.UTNPhysicsEngine.optimizacion.spatialHash
 {
-    class SpatialHash
+    public class SpatialHash
     {
-        private uint _cellSize;
+        private Vector3 _cellSize;
         private uint _maxBuckets;
         private Dictionary<SpatialHashKey, SpatialHashBucket> _hash = new Dictionary<SpatialHashKey, SpatialHashBucket>();
 
-        public SpatialHash(uint cellSize, uint maxBuckets)
+        public SpatialHash(Vector3 cellSize, uint maxBuckets)
         {
             _cellSize = cellSize;
             _maxBuckets = maxBuckets;

@@ -98,6 +98,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="UTNPhysicsEngine\Constant.cs" />
+    <Compile Include="UTNPhysicsEngine\Ejemplo9.cs" />
     <Compile Include="UTNPhysicsEngine\Ejemplo10.cs" />
     <Compile Include="UTNPhysicsEngine\Ejemplo0.cs" />
     <Compile Include="UTNPhysicsEngine\Ejemplo8.cs" />
@@ -108,6 +109,8 @@
     <Compile Include="UTNPhysicsEngine\Ejemplo3.cs" />
     <Compile Include="UTNPhysicsEngine\math\CordinateSystem.cs" />
     <Compile Include="UTNPhysicsEngine\math\MathCordHelper.cs" />
+    <Compile Include="UTNPhysicsEngine\matias\EjemploMatias.cs" />
+    <Compile Include="UTNPhysicsEngine\matias\TgcSphere.cs" />
     <Compile Include="UTNPhysicsEngine\optimizacion\octree\FastSerialization.cs" />
     <Compile Include="UTNPhysicsEngine\optimizacion\octree\IOctree.cs" />
     <Compile Include="UTNPhysicsEngine\optimizacion\octree\Octree.cs" />

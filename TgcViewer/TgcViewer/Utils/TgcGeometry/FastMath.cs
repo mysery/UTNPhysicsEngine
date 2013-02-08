@@ -366,13 +366,19 @@ namespace TgcViewer.Utils.TgcGeometry
             return new Vector3(v1.X/f1, v1.Y/f1, v1.Z/f1);
         }
 
-        public static Vector3 clampVector(Vector3 vector, float min, float max)
+        public static Vector3 clamp(Vector3 vector, float min, float max)
         {
             return new Vector3( FastMath.clamp(vector.X, min, max),
                                 FastMath.clamp(vector.Y, min, max),
                                 FastMath.clamp(vector.Z, min, max));
         }
 
+        public static Vector3 clamp(Vector3 vector, Vector3 min, Vector3 max)
+        {
+            return new Vector3(FastMath.clamp(vector.X, min.X, max.X),
+                                FastMath.clamp(vector.Y, min.Y, max.Y),
+                                FastMath.clamp(vector.Z, min.Z, max.Z));
+        }
         
         #endregion
     }

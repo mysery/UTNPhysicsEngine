@@ -9,7 +9,7 @@ using Examples.UTNPhysicsEngine.optimizacion.spatialHash;
 
 namespace Examples.UTNPhysicsEngine.physics.body
 {
-    class SphereBody : Body
+    public class SphereBody : Body
     {
         public float radius;
         public float margin = 0.04f; //Para tener un margen de error en las collisiones.

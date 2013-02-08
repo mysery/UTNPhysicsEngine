@@ -44,8 +44,8 @@ namespace Examples
             m.M31 = 0f; m.M32 = 0f;m.M33 = 1f;
             Vector3 halfExtend = new Vector3(20f, 20f, 20f);
             // creo una grilla de cuerpos.
-            int numberBoxPerSide = 15;            
-            float separationBetweenBox = 4.0f;
+            int numberBoxPerSide = 12;            
+            float separationBetweenBox = 8.0f;
 
             float xCentre = 0f;
             float zCentre = 0f;

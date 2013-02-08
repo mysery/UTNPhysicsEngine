@@ -170,9 +170,8 @@ namespace Examples.UTNPhysicsEngine.physics
         {
             List<Contact> resultList = new List<Contact>();
             Vector3 pOnBox, pOnSphere;
-            Vector3 sphereCenter = s.Center;
             float radius = s.Radius;
-            insertionDistance = CollisionAlgoritms.GetSphereDistance(b, out pOnBox, out pOnSphere, sphereCenter, radius);
+            insertionDistance = GetSphereDistance(b, s, out pOnBox, out pOnSphere);
 
             if (insertionDistance < float.Epsilon)
             {
@@ -345,6 +344,159 @@ namespace Examples.UTNPhysicsEngine.physics
         private static Contact buildContact(BoxBody b1, BoxBody b2, float insertionDistance)
         {
             return null;
+        }
+
+
+        private static float GetSphereDistance(BoxBody boxShape, SphereBody s,out Vector3 pointOnBox, out Vector3 pointOnSphere)
+        {
+            pointOnBox = new Vector3();
+            pointOnSphere = new Vector3();
+            Vector3 sphereCenter = s.Center;
+            float radius = s.radius;
+
+            float margins;
+            Vector3[] bounds = new Vector3[2];
+
+            bounds[0] = -boxShape.extendend;
+            bounds[1] = boxShape.extendend;
+
+            margins = boxShape.margin + s.margin; //also add sphereShape margin?
+
+            CordinateSystem boxWSCoord = boxShape.wordCordSys();
+
+            Vector3[] boundsVec = new Vector3[2];
+            float penetration;
+
+            boundsVec[0] = bounds[0];
+            boundsVec[1] = bounds[1];
+
+            Vector3 marginsVec = new Vector3(margins, margins, margins);
+
+            // add margins
+            bounds[0] += marginsVec;
+            bounds[1] -= marginsVec;
+
+            /////////////////////////////////////////////////
+
+            Vector3 prel, normal, v3P;
+            Vector3[] n = new Vector3[6];
+            float sep = float.PositiveInfinity, sepThis;
+
+            n[0] = new Vector3(-1.0f, 0.0f, 0.0f);
+            n[1] = new Vector3(0.0f, -1.0f, 0.0f);
+            n[2] = new Vector3(0.0f, 0.0f, -1.0f);
+            n[3] = new Vector3(1.0f, 0.0f, 0.0f);
+            n[4] = new Vector3(0.0f, 1.0f, 0.0f);
+            n[5] = new Vector3(0.0f, 0.0f, 1.0f);
+
+            // convert  point in local space
+            prel = boxWSCoord.toLocalCoordsPoint(sphereCenter);
+
+            bool found = false;
+
+            v3P = prel;
+
+            for (int i = 0; i < 6; i++)
+            {
+                int j = i < 3 ? 0 : 1;
+                if ((sepThis = (Vector3.Dot(v3P - bounds[j], n[i]))) > 0.0f)
+                {
+                    v3P = v3P - n[i] * sepThis;
+                    found = true;
+                }
+            }
+
+            //
+
+            if (found)
+            {
+                bounds[0] = boundsVec[0];
+                bounds[1] = boundsVec[1];
+
+                normal = Vector3.Normalize(prel - v3P);
+                pointOnBox = v3P + normal * margins;
+                pointOnSphere = prel - normal * radius;
+
+                if ((Vector3.Dot(pointOnSphere - pointOnBox, normal)) > 0.0f)
+                {
+                    return 1.0f;
+                }
+
+                // transform back in world space
+                pointOnBox = boxWSCoord.fromLocalCoordPoint(pointOnBox);
+                pointOnSphere = boxWSCoord.fromLocalCoordPoint(pointOnSphere);
+
+                float seps2 = (pointOnBox - pointOnSphere).LengthSq();
+
+                //if this fails, fallback into deeper penetration case, below
+                if (seps2 > float.Epsilon)
+                {
+                    sep = -(float)Math.Sqrt(seps2);
+                    normal = (pointOnBox - pointOnSphere);
+                    normal *= 1f / sep;
+                }
+                return sep;
+            }
+
+            //////////////////////////////////////////////////
+            // Deep penetration case
+
+            penetration = GetSpherePenetration(boxShape, ref pointOnBox, ref pointOnSphere, sphereCenter, radius, bounds[0], bounds[1]);
+
+            bounds[0] = boundsVec[0];
+            bounds[1] = boundsVec[1];
+
+            if (penetration <= 0.0f)
+                return (penetration - margins);
+            else
+                return 1.0f;
+        }
+
+        private static float GetSpherePenetration(BoxBody boxObject, ref Vector3 pointOnBox, ref Vector3 pointOnSphere, Vector3 sphereCenter, float radius, Vector3 aabbMin, Vector3 aabbMax)
+        {
+            Vector3[] bounds = new Vector3[2];
+            bounds[0] = aabbMin;
+            bounds[1] = aabbMax;
+
+            Vector3 p0 = new Vector3(), prel, normal = new Vector3();
+            Vector3[] n = new Vector3[6];
+            float sep = -10000000.0f, sepThis;
+
+            n[0] = new Vector3(-1.0f, 0.0f, 0.0f);
+            n[1] = new Vector3(0.0f, -1.0f, 0.0f);
+            n[2] = new Vector3(0.0f, 0.0f, -1.0f);
+            n[3] = new Vector3(1.0f, 0.0f, 0.0f);
+            n[4] = new Vector3(0.0f, 1.0f, 0.0f);
+            n[5] = new Vector3(0.0f, 0.0f, 1.0f);
+
+            CordinateSystem boxWSCoord = boxObject.wordCordSys();
+
+            // convert point in local space
+            prel = boxWSCoord.toLocalCoordsPoint(sphereCenter);
+
+            ///////////
+
+            for (int i = 0; i < 6; i++)
+            {
+                int j = i < 3 ? 0 : 1;
+                if ((sepThis = (Vector3.Dot(prel - bounds[j], n[i])) - radius) > 0.0f) return 1.0f;
+                if (sepThis > sep)
+                {
+                    p0 = bounds[j];
+                    normal = n[i];
+                    sep = sepThis;
+                }
+            }
+
+            pointOnBox = prel - normal * (Vector3.Dot(normal, (prel - p0)));
+            pointOnSphere = pointOnBox + normal * sep;
+
+            // transform back in world space
+            pointOnBox = boxWSCoord.fromLocalCoordPoint(pointOnBox);
+            pointOnSphere = boxWSCoord.fromLocalCoordPoint(pointOnSphere);
+            normal = Vector3.Normalize(pointOnBox - pointOnSphere);
+
+            return sep;
         }
     }
 }

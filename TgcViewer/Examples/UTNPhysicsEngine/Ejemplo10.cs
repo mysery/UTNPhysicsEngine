@@ -44,44 +44,75 @@ namespace Examples
             Vector3 halfExtend = new Vector3(20f, 20f, 20f);
             //m.M12 = 1f;
             //m.M32 = -1f;
-            BoxBody box = new BoxBody(m, halfExtend, new Vector3(), new Vector3(), new Vector3(0f, -0.1f, 0f), 1f);
+            BoxBody box = new BoxBody(m, halfExtend, new Vector3(), new Vector3(), new Vector3(), 0f);
             proto.Bodys.Add(box);
-            box = new BoxBody(m, halfExtend, new Vector3(100f, 0f, 100f), new Vector3(), new Vector3(0f, -0.1f, 0f), 1f);
+            box = new BoxBody(m, halfExtend, box.position + new Vector3(halfExtend.X * 2, 0f, halfExtend.Z * 2), new Vector3(), new Vector3(), 0f);
             proto.Bodys.Add(box);
-            box = new BoxBody(m, halfExtend, new Vector3(-100f, 0f, -100f), new Vector3(), new Vector3(0f, -0.1f, 0f), 1f);
+            box = new BoxBody(m, halfExtend, box.position - new Vector3(halfExtend.X * 4, 0f, halfExtend.Z * 4), new Vector3(), new Vector3(), 0f);
             proto.Bodys.Add(box);
             halfExtend = new Vector3(20f, 30f, 20f);
-            box = new BoxBody(m, halfExtend, new Vector3(0f, 0f, -100f), new Vector3(), new Vector3(0f, -0.1f, 0f), 1f);
+            box = new BoxBody(m, halfExtend, box.position - new Vector3(halfExtend.X * 2, 0f, 0f), new Vector3(), new Vector3(), 0f);
             proto.Bodys.Add(box);
             halfExtend = new Vector3(40f, 20f, 20f);
-            box = new BoxBody(m, halfExtend, new Vector3(-100f, 0f, 100f), new Vector3(), new Vector3(0f, -0.1f, 0f), 1f);
+            box = new BoxBody(m, halfExtend, box.position + new Vector3(halfExtend.X * 4, 0f, halfExtend.Z * 2), new Vector3(), new Vector3(), 0f);
             proto.Bodys.Add(box);
 
             m.M12 = 1f;
             m.M32 = -1f;
             halfExtend = new Vector3(20f, 20f, 20f);
-            box = new BoxBody(m, halfExtend, new Vector3(200f, 0f, 200f), new Vector3(), new Vector3(0f, -0.1f, 0f), 1f);
+            box = new BoxBody(m, halfExtend, new Vector3(80f, 0f, -80f), new Vector3(), new Vector3(), 0f);
             proto.Bodys.Add(box);
 
             m.M12 = 0f;
             m.M32 = 0f;
             m.M13 = 1f;
             m.M33 = 1f;
-            box = new BoxBody(m, halfExtend, new Vector3(-200f, 0f, -200f), new Vector3(), new Vector3(0f, -0.1f, 0f), 1f);
+            box = new BoxBody(m, halfExtend, new Vector3(40f, 0f, -40f), new Vector3(), new Vector3(), 0f);
             proto.Bodys.Add(box);
 
             m.M12 = -1f;
             m.M32 = -1f;
             m.M13 = -1f;
             m.M33 = -1f;
-            box = new BoxBody(m, halfExtend, new Vector3(0f, 0f, -200f), new Vector3(), new Vector3(0f, -0.1f, 0f), 1f);
+            box = new BoxBody(m, halfExtend, new Vector3(40f, 50f, 40f), new Vector3(), new Vector3(), 0f);
             proto.Bodys.Add(box);
 
             m.M11 = 0f;
             m.M22 = 0f;
-            m.M33 = 0f;            
-            box = new BoxBody(m, halfExtend, new Vector3(0f, 0f, 200f), new Vector3(), new Vector3(0f, -0.1f, 0f), 1f);
+            m.M33 = 0f;
+            box = new BoxBody(m, halfExtend, new Vector3(40f, 40f, -40f), new Vector3(), new Vector3(), 0f);
             proto.Bodys.Add(box);
+
+            #region Spheres
+
+            // creo una grilla de cuerpos.
+            const int numberSpheresPerSide = 10;
+            const float radius = 10.0f;
+            const float separationBetweenSpheres = 2.0f;
+
+            const float xCentre = 0.0f;
+            const float zCentre = 0.0f;
+            const float yLocation = 100.0f;
+            const float initialX = xCentre - (((numberSpheresPerSide - 1) * ((radius * 2.0f) + separationBetweenSpheres)) / 2.0f) - (separationBetweenSpheres / 2.0f);
+            const float initialZ = zCentre - (((numberSpheresPerSide - 1) * ((radius * 2.0f) + separationBetweenSpheres)) / 2.0f) - (separationBetweenSpheres / 2.0f);
+
+            for (int x = 0; x < numberSpheresPerSide; ++x)
+            {
+                for (int z = 0; z < numberSpheresPerSide; ++z)
+                {
+                    SphereBody sphere = new SphereBody(radius,
+                                                        new Vector3(initialX + (x * ((radius * 2) + separationBetweenSpheres)),
+                                                                    yLocation,
+                                                                    initialZ + (z * ((radius * 2) + separationBetweenSpheres))),
+                                                        new Vector3(),
+                                                        new Vector3(),
+                                                        1.0f);
+
+                    proto.Bodys.Add(sphere);
+                }
+            }
+
+            #endregion
         }
 
 

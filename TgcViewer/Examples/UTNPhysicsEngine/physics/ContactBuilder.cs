@@ -168,7 +168,19 @@ namespace Examples.UTNPhysicsEngine.physics
 
         private static List<Contact> buildContact(BoxBody b, SphereBody s, float insertionDistance)
         {
-            return null;
+            List<Contact> resultList = new List<Contact>();
+            Vector3 pOnBox, pOnSphere;
+            Vector3 sphereCenter = s.Center;
+            float radius = s.Radius;
+            insertionDistance = CollisionAlgoritms.GetSphereDistance(b, out pOnBox, out pOnSphere, sphereCenter, radius);
+
+            if (insertionDistance < float.Epsilon)
+            {
+                Vector3 normalOnSurfaceB = Vector3.Normalize(pOnBox - pOnSphere);
+                resultList.Add(new Contact(s, b, normalOnSurfaceB, pOnBox, insertionDistance));
+            }
+            
+            return resultList;
         }
 
         private static List<Contact> buildContact(SphereBody s, BoxBody b, float insertionDistance)
@@ -329,54 +341,6 @@ namespace Examples.UTNPhysicsEngine.physics
              */
             return resultList;
         }
-
-    public float GetSpherePenetration(BoxBody boxObject, ref Vector3 pointOnBox, ref Vector3 pointOnSphere, Vector3 sphereCenter, float radius, Vector3 aabbMin, Vector3 aabbMax)
-		{
-			Vector3[] bounds = new Vector3[2];
-
-			bounds[0] = aabbMin;
-			bounds[1] = aabbMax;
-
-			Vector3 p0 = new Vector3(), tmp, prel, normal = new Vector3();
-			Vector3[] n = new Vector3[6];
-			float sep = -10000000.0f, sepThis;
-
-			n[0] = new Vector3(-1.0f, 0.0f, 0.0f);
-			n[1] = new Vector3(0.0f, -1.0f, 0.0f);
-			n[2] = new Vector3(0.0f, 0.0f, -1.0f);
-			n[3] = new Vector3(1.0f, 0.0f, 0.0f);
-			n[4] = new Vector3(0.0f, 1.0f, 0.0f);
-			n[5] = new Vector3(0.0f, 0.0f, 1.0f);
-
-            CordinateSystem boxWSCoord = boxObject.wordCordSys();
-
-			// convert point in local space
-			prel = boxWSCoord.toLocalCoordsPoint(sphereCenter);
-
-			///////////
-
-			for (int i = 0; i < 6; i++)
-			{
-				int j = i < 3 ? 0 : 1;
-				if ((sepThis = (Vector3.Dot(prel - bounds[j], n[i])) /*- radius*/) > 0.0f) return 1.0f;
-				if (sepThis > sep)
-				{
-					p0 = bounds[j];
-					normal = n[i];
-					sep = sepThis;
-				}
-			}
-
-			pointOnBox = prel - normal * (Vector3.Dot(normal, (prel - p0)));
-			pointOnSphere = pointOnBox + normal * sep;
-
-			// transform back in world space
-			pointOnBox = boxWSCoord.fromLocalCoordVector(pointOnBox);
-			pointOnBox = boxWSCoord.fromLocalCoordVector(pointOnSphere);
-			normal = Vector3.Normalize(pointOnBox - pointOnSphere);
-
-			return sep;
-		}
 
         private static Contact buildContact(BoxBody b1, BoxBody b2, float insertionDistance)
         {

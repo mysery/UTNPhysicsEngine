@@ -93,7 +93,8 @@ namespace Examples.UTNPhysicsEngine.physics.body
             Vector3 extent = new Vector3(Vector3.Dot(row1, extendend),
                                          Vector3.Dot(row2, extendend),
                                          Vector3.Dot(row3, extendend));
-            extent += new Vector3(margin, margin, margin);
+            //Esto deberia ser solo para deteccion de colisiones.
+            //extent += new Vector3(margin, margin, margin);
 
             aabbMin = position - extent; //en WordSpace.
             aabbMax = position + extent; //en WordSpace.

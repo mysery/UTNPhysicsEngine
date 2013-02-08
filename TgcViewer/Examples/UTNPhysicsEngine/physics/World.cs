@@ -13,7 +13,7 @@ using Examples.UTNPhysicsEngine.optimizacion.spatialHash;
 
 namespace Examples.UTNPhysicsEngine.physics
 {
-    class World
+    public class World
     {
         //private Octree _octree;
         private SpatialHash _spatialHash;
@@ -33,7 +33,7 @@ namespace Examples.UTNPhysicsEngine.physics
         private float localTime = FIXED_TIME_STEP;
         
         private List<Body> bodys;
-        private float worldSize;
+        private Vector3 worldSize;
         //private ISet<Contact> contacts = new HashSet<Contact>(new ContactComparer());
         private ArrayList contacts = new ArrayList();//<Contact>();//new ContactComparer());
         private PlaneBody[] planesLimits = new PlaneBody[6];
@@ -43,10 +43,10 @@ namespace Examples.UTNPhysicsEngine.physics
         public bool debugMode = false;
         public bool applyRay = false;
 
-        public World(List<Body> bodys, float worldSize)
+        public World(List<Body> bodys, float worldSize, float indexSizeCell=0.1f)
         {
             this.bodys = bodys;
-            this.worldSize = worldSize;
+            this.worldSize = new Vector3(worldSize, worldSize, worldSize);
             //Iniciarlizar PickingRay
             this.pickingRay = new TgcPickingRay();
 
@@ -68,10 +68,36 @@ namespace Examples.UTNPhysicsEngine.physics
             planesLimits[5] = new PlaneBody(new Plane(-1, 0, 0, -worldSize), new Vector3(-worldSize, 0, 0), new Vector3(), new Vector3(), 0f);
             planesLimits[5].idCode = planesLimits[0].idCode;
 
-            this._spatialHash = new SpatialHash((uint)worldSize / 10, 2000);
-            this.updatePostionDistance = FastMath.Pow2( worldSize / 10 );
+            this._spatialHash = new SpatialHash(this.worldSize * indexSizeCell, 2000);
         }
 
+        public World(List<Body> bodys, Vector3 worldSize, float indexSizeCell=0.1f)
+        {
+            this.bodys = bodys;
+            this.worldSize = worldSize;
+            //Iniciarlizar PickingRay
+            this.pickingRay = new TgcPickingRay();
+
+            //Up
+            planesLimits[0] = new PlaneBody(new Plane(0, 1, 0, worldSize.Y), new Vector3(0, worldSize.Y, 0), new Vector3(), new Vector3(), 0f);
+            //Down
+            planesLimits[1] = new PlaneBody(new Plane(0, -1, 0, -worldSize.Y), new Vector3(0, -worldSize.Y, 0), new Vector3(), new Vector3(), 0f);
+            planesLimits[1].idCode = planesLimits[0].idCode;
+            //Front
+            planesLimits[2] = new PlaneBody(new Plane(0, 0, 1, worldSize.Z), new Vector3(0, 0, worldSize.Z), new Vector3(), new Vector3(), 0f);
+            planesLimits[2].idCode = planesLimits[0].idCode;
+            //Back
+            planesLimits[3] = new PlaneBody(new Plane(0, 0, -1, -worldSize.Z), new Vector3(0, 0, -worldSize.Z), new Vector3(), new Vector3(), 0f);
+            planesLimits[3].idCode = planesLimits[0].idCode;
+            //Right
+            planesLimits[4] = new PlaneBody(new Plane(1, 0, 0, worldSize.X), new Vector3(worldSize.X, 0, 0), new Vector3(), new Vector3(), 0f);
+            planesLimits[4].idCode = planesLimits[0].idCode;
+            //Left
+            planesLimits[5] = new PlaneBody(new Plane(-1, 0, 0, -worldSize.X), new Vector3(-worldSize.X, 0, 0), new Vector3(), new Vector3(), 0f);
+            planesLimits[5].idCode = planesLimits[0].idCode;
+
+            this._spatialHash = new SpatialHash(this.worldSize * indexSizeCell, 2000);
+        }
         
         internal void optimize()
         {
@@ -133,7 +159,7 @@ namespace Examples.UTNPhysicsEngine.physics
                     
                 SpatialHashAABB oldAabb = body.BoundingBox;
                 body.integrateVelocitySI(timeStep);
-                body.position = FastMath.clampVector(body.position, -worldSize, worldSize);
+                body.position = FastMath.clamp(body.position, -worldSize, worldSize);
                 SpatialHashAABB newAabb = body.BoundingBox;
                 _spatialHash.update(oldAabb, newAabb, body);
                 //_spatialHash.add(newAabb.aabbMin, newAabb.aabbMax, body);

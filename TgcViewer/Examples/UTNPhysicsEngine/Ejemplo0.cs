@@ -65,6 +65,12 @@ namespace Examples
         public override void render(float elapsedTime)
         {
             proto.render(elapsedTime);
+            if (proto.Bodys.Count == 25)
+            {
+                Body body = proto.Bodys[0];
+                proto.world.removeBody(body); //El proto y el world tienen la misma lista, con lo cual alcanza con sacarlo de una.
+            }
+
         }
     }
 }

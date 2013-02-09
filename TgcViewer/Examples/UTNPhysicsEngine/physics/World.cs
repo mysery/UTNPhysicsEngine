@@ -113,6 +113,12 @@ namespace Examples.UTNPhysicsEngine.physics
             _spatialHash.add(body.BoundingBox.aabbMin, body.BoundingBox.aabbMax, body);            
         }
 
+        internal void removeBody(Body body)
+        {
+            _spatialHash.remove(body.BoundingBox.aabbMin, body.BoundingBox.aabbMax, body);
+            this.bodys.Remove(body);
+        }
+
         internal void step(float timeStep)
         {
             int numSimulationSubSteps = 1;

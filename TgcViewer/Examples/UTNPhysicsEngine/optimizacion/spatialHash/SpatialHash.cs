@@ -20,6 +20,11 @@ namespace Examples.UTNPhysicsEngine.optimizacion.spatialHash
             _maxBuckets = maxBuckets;
         }
 
+        public void clear(int capacity)
+        {
+            this._hash = new Dictionary<SpatialHashKey, SpatialHashBucket>(capacity);
+        }
+
         public void add(Vector3 aabb_min, Vector3 aabb_max, Body body)
         {
             SpatialHashKey key_min = new SpatialHashKey(_cellSize, aabb_min);

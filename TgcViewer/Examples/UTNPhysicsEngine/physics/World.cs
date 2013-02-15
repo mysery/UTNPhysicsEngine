@@ -101,6 +101,7 @@ namespace Examples.UTNPhysicsEngine.physics
         
         internal void optimize()
         {
+            this._spatialHash.clear(bodys.Count);
             foreach (Body body in bodys)
             {
                 //_octree.AddNode(body.position, body, body.BoundingBox);

@@ -66,6 +66,7 @@ namespace Examples.UTNPhysicsEngine.matias
             this.bodys = new List<Body>();
             this.limitsWorld = new TgcBoundingBox(-WORLD_EXTENTS, WORLD_EXTENTS);
             this.world = new World(this.bodys, Vector3.Scale(WORLD_EXTENTS, 2));
+            this.world.timeSteps = 0.25f;
 
             //Cargar shader para esferas
             string compilationErrors;
@@ -194,7 +195,7 @@ namespace Examples.UTNPhysicsEngine.matias
             }
 
             //Optimizar objetos estaticos
-            world.optimize();
+            //world.optimize();
 
 
 

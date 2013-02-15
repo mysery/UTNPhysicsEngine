@@ -48,7 +48,7 @@ namespace TgcViewer.Utils.Modifiers
 			else
 			{
 				numericUpDown.Increment = 1;
-				trackBar.Value = defaultValue;
+                trackBar.Value = defaultValue - minValue;
 				trackBar.Maximum = maxValue - minValue;
 			}
 			

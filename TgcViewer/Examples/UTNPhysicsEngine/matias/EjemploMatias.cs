@@ -33,10 +33,13 @@ namespace Examples.UTNPhysicsEngine.matias
         List<SphereElement> sphereElements;
         SphereType[] sphereTypes;
         TgcBox lightMesh;
-        int currentType = 0;
         List<TgcMeshShader> meshesEscenario;
         List<BoxBody> rigidBoxes;
         List<SphereBody> invisibleSpheres;
+        BoxBody tapaMovilBody;
+        TgcMeshShader tapaMovilMesh;
+        MyFpsCamera camera;
+
 
 
         public override string getCategory()
@@ -72,54 +75,6 @@ namespace Examples.UTNPhysicsEngine.matias
             {
                 throw new Exception("Error al cargar shader: " + shaderPath + ". Errores: " + compilationErrors);
             }
-
-
-            //Cargar escenario
-            TgcSceneLoader loaderEscenario = new TgcSceneLoader();
-            loaderEscenario.MeshFactory = new CustomMeshShaderFactory();
-            TgcScene scene = loaderEscenario.loadSceneFromFile(GuiController.Instance.ExamplesMediaDir + "CanchaBasket\\CanchaBasket-TgcScene.xml");
-            
-
-            //Separar meshes segun layer
-            this.meshesEscenario = new List<TgcMeshShader>();
-            this.rigidBoxes = new List<BoxBody>();
-            this.invisibleSpheres = new List<SphereBody>();
-            foreach (TgcMeshShader m in scene.Meshes)
-            {
-                m.Effect = effectSphere;
-                
-                //Cajas rigidas
-                if (m.Layer == "boundingBox")
-                {
-                    //Crear Box para colision
-                    BoxBody body = new BoxBody(Matrix.Identity, m.BoundingBox.calculateAxisRadius(), m.BoundingBox.calculateBoxCenter(), new Vector3(0, 0, 0), new Vector3(0, 0, 0), 0f);
-                    this.world.addBody(body);
-                    this.rigidBoxes.Add(body);
-
-                    //Son visibles
-                    this.meshesEscenario.Add(m);
-                }
-                //Esferas rigidas invisibles
-                else if (m.Layer == "boundingSphereInvisibles")
-                {
-                    SphereBody body = new SphereBody(0.118f, m.BoundingBox.calculateBoxCenter(), new Vector3(0, 0, 0), new Vector3(0, 0, 0), 0f, false);
-                    body.restitution = 0.8f;
-                    this.world.addBody(body);
-                    this.invisibleSpheres.Add(body);
-                }
-                //Demas objetos de adorno del escenario
-                else
-                {
-                    //Son visibles
-                    this.meshesEscenario.Add(m);
-                }
-
-            }
-
-            //Optimizar objetos estaticos
-            world.optimize();
-
-
 
 
             //Crear tipos de meshes de esfera
@@ -158,19 +113,108 @@ namespace Examples.UTNPhysicsEngine.matias
             sphereType.mass = 0.45f;
             sphereType.restitution = 0.6f;
             sphereTypes[2] = sphereType;
+
+
+
+            //Cargar escenario
+            TgcSceneLoader loaderEscenario = new TgcSceneLoader();
+            loaderEscenario.MeshFactory = new CustomMeshShaderFactory();
+            TgcScene scene = loaderEscenario.loadSceneFromFile(GuiController.Instance.ExamplesMediaDir + "CanchaBasket\\CanchaBasket-TgcScene.xml");
             
 
+            //Separar meshes segun layer
+            this.meshesEscenario = new List<TgcMeshShader>();
+            this.rigidBoxes = new List<BoxBody>();
+            this.invisibleSpheres = new List<SphereBody>();
+            foreach (TgcMeshShader m in scene.Meshes)
+            {
+                //Setear shader
+                m.Effect = effectSphere;
+                
+                //Cajas rigidas
+                if (m.Layer == "boundingBox")
+                {
+                    //Crear Box para colision
+                    BoxBody body = new BoxBody(Matrix.Identity, m.BoundingBox.calculateAxisRadius(), m.BoundingBox.calculateBoxCenter(), new Vector3(0, 0, 0), new Vector3(0, 0, 0), 0f);
+                    this.world.addBody(body);
 
-            //Camera
-            GuiController.Instance.FpsCamera.Enable = true;
-            GuiController.Instance.FpsCamera.MovementSpeed = 5;
-            GuiController.Instance.FpsCamera.JumpSpeed = 5f;
-            GuiController.Instance.FpsCamera.setCamera(new Vector3(0, -WORLD_EXTENTS.Y + 1f, 0), new Vector3(0, -WORLD_EXTENTS.Y + 1f, 1));
+                    //Tapa de canasto que se puede remover
+                    if (m.Name == "TapaMovil")
+                    {
+                        this.tapaMovilBody = body;
+                        this.tapaMovilMesh = m;
+                    }
+                    else
+                    {
+                        this.rigidBoxes.Add(body);
+
+                        //Son visibles
+                        this.meshesEscenario.Add(m);
+                    }
+
+
+                    
+                }
+                //Esferas rigidas invisibles
+                else if (m.Layer == "boundingSphereInvisibles")
+                {
+                    //Crear body para esfera
+                    SphereBody body = new SphereBody(0.118f, m.BoundingBox.calculateBoxCenter(), new Vector3(0, 0, 0), new Vector3(0, 0, 0), 0f, false);
+                    body.restitution = 0.8f;
+                    this.world.addBody(body);
+                    this.invisibleSpheres.Add(body);
+                }
+                //Pelota visibles y que son SphereBody
+                else if (m.Layer == "pelotas")
+                {
+                    //Crear pelota de basket
+                    SphereElement sphereElement = new SphereElement();
+
+                    //Tipo de esfera Basket
+                    sphereElement.type = sphereTypes[0];
+
+                    //Crear cuerpo de esfera
+                    sphereElement.body = new SphereBody(sphereElement.type.radius, m.BoundingBox.calculateBoxCenter(), new Vector3(0, 0, 0), new Vector3(0, 0, 0), sphereElement.type.mass);
+                    sphereElement.body.restitution = sphereElement.type.restitution;
+
+                    //Agregar al world
+                    this.bodys.Add(sphereElement.body);
+                    this.world.addBody(sphereElement.body);
+
+                    //Agregar a lista de elementos
+                    this.sphereElements.Add(sphereElement);
+                }
+                //Demas objetos de adorno del escenario
+                else
+                {
+                    //Son visibles
+                    this.meshesEscenario.Add(m);
+                }
+
+            }
+
+            //Optimizar objetos estaticos
+            world.optimize();
+
+
+
+            //Camara personalizada
+            camera = new MyFpsCamera();
+            camera.Enable = true;
+            camera.MovementSpeed = 0.1f;
+            camera.JumpSpeed = 0.1f;
+            camera.RotationSpeed = 4f;
+            camera.setCamera(new Vector3(0, -WORLD_EXTENTS.Y + 1f, 0), new Vector3(0, -WORLD_EXTENTS.Y + 1f, 1));
 
 
             //Mesh para la luz
             lightMesh = TgcBox.fromSize(new Vector3(0, WORLD_EXTENTS.Y / 2f, 0), new Vector3(1, 1, 1), Color.Red);
 
+
+            //Modifiers
+            GuiController.Instance.Modifiers.addInterval("objeto", new string[] { "Basket", "Tenis", "Futbol" }, 0);
+            GuiController.Instance.Modifiers.addInterval("cantidad", new string[] { "1", "2", "3", "4", "5", "10" }, 0);
+            GuiController.Instance.Modifiers.addBoolean("cajon", "cajon", true);
         }
 
         public override void render(float elapsedTime)
@@ -178,37 +222,16 @@ namespace Examples.UTNPhysicsEngine.matias
             //compute: integrate position, collition detect, contacts solvers
             world.step(elapsedTime);
 
-            Vector3 cameraPos = GuiController.Instance.FpsCamera.getPosition();
-            Vector3 cameraLookAt = GuiController.Instance.FpsCamera.getLookAt();
 
             //Agregar nueva esfera
             if (GuiController.Instance.D3dInput.buttonPressed(TgcD3dInput.MouseButtons.BUTTON_RIGHT))
             {
-                //Crear elemento de esfera
-                SphereElement sphereElement = new SphereElement();
-
-                //Tipo de esfera
-                sphereElement.type = sphereTypes[++currentType % sphereTypes.Length];
-
-                //Parametros de esfera
-                Vector3 position = cameraPos;
-                Vector3 velocity = Vector3.Normalize(cameraLookAt - cameraPos) * 10;
-                Vector3 acceleration = new Vector3();// por default es la gravedad. (0.0f, -9.8f, 0.0f)*masa;
-
-                //Crear cuerpo de esfera
-                sphereElement.body = new SphereBody(sphereElement.type.radius, position, velocity, acceleration, sphereElement.type.mass);//no hace falta el true, tiene valor default.
-                sphereElement.body.restitution = sphereElement.type.restitution;
-
-                
-                
-
-                //Agregar al world
-                this.bodys.Add(sphereElement.body);
-                this.world.addBody(sphereElement.body);
-
-                //Agregar a lista de elementos
-                this.sphereElements.Add(sphereElement);
+                dispararPelota();
             }
+
+
+
+
 
 
             //Cargar variables shader de la luz
@@ -237,8 +260,6 @@ namespace Examples.UTNPhysicsEngine.matias
 
             }
 
-
-
             //Render escenario
             foreach (TgcMeshShader mesh in this.meshesEscenario)
             {
@@ -248,9 +269,69 @@ namespace Examples.UTNPhysicsEngine.matias
             //Renderizar mesh de luz
             lightMesh.render();
 
+
+
+            //Dibujar/Quitar tapa movil
+            bool cajon = (bool)GuiController.Instance.Modifiers["cajon"];
+            if (cajon)
+            {
+                tapaMovilMesh.render();
+            }
+            else
+            {
+                if (tapaMovilMesh.Enabled)
+                {
+                    tapaMovilMesh.Enabled = false;
+                    world.removeBody(tapaMovilBody);
+                }
+            }
+
+
+
             //Dibujar limites del escenario
             //limitsWorld.render();
 
+        }
+
+        /// <summary>
+        /// Accion de disparar una nueva esfera
+        /// </summary>
+        private void dispararPelota()
+        {
+            Vector3 cameraPos = camera.getPosition();
+            Vector3 cameraLookAt = camera.getLookAt();
+
+            //Tipo de esfera
+            string tipoObjeto = (string)GuiController.Instance.Modifiers["objeto"];
+            SphereType sphereType;
+            if (tipoObjeto == "Basket") sphereType = sphereTypes[0];
+            else if (tipoObjeto == "Tenis") sphereType = sphereTypes[1];
+            else sphereType = sphereTypes[2];
+
+            //Crear n esferas
+            int cantidad = int.Parse((string)GuiController.Instance.Modifiers["cantidad"]);
+            for (int i = 0; i < cantidad; i++)
+            {
+                //Crear elemento de esfera
+                SphereElement sphereElement = new SphereElement();
+                sphereElement.type = sphereType;
+
+                //Parametros de esfera
+                Vector3 position = cameraPos + new Vector3(i * sphereElement.type.radius * 2f, i * sphereElement.type.radius * 2f, 0);
+                Vector3 velocity = Vector3.Normalize(cameraLookAt - cameraPos) * 10;
+                Vector3 acceleration = new Vector3();// por default es la gravedad. (0.0f, -9.8f, 0.0f)*masa;
+
+                //Crear cuerpo de esfera
+                sphereElement.body = new SphereBody(sphereElement.type.radius, position, velocity, acceleration, sphereElement.type.mass);
+                sphereElement.body.restitution = sphereElement.type.restitution;
+
+                //Agregar al world
+                this.bodys.Add(sphereElement.body);
+                this.world.addBody(sphereElement.body);
+
+                //Agregar a lista de elementos
+                this.sphereElements.Add(sphereElement);
+            }
         }
 
         public override void close()

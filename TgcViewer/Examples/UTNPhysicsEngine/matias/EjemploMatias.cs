@@ -22,6 +22,10 @@ namespace Examples.UTNPhysicsEngine.matias
     public class EjemploMatias : TgcExample
     {
 
+        //Cancha de basket: 28.65m by 15.24m
+        private readonly Vector3 WORLD_EXTENTS = new Vector3(20, 20, 25);
+
+
         private World world;
         private TgcBoundingBox limitsWorld;
         private List<Body> bodys;
@@ -31,6 +35,8 @@ namespace Examples.UTNPhysicsEngine.matias
         TgcBox lightMesh;
         int currentType = 0;
         List<TgcMeshShader> meshesEscenario;
+        List<BoxBody> rigidBoxes;
+        List<SphereBody> invisibleSpheres;
 
 
         public override string getCategory()
@@ -55,10 +61,8 @@ namespace Examples.UTNPhysicsEngine.matias
 
             //World
             this.bodys = new List<Body>();
-            float worldSize = 300f;
-            this.world = new World(this.bodys, worldSize);
-            this.limitsWorld = new TgcBoundingBox(new Vector3(-worldSize, -worldSize, -worldSize), new Vector3(worldSize, worldSize, worldSize));
-            world.optimize();
+            this.limitsWorld = new TgcBoundingBox(-WORLD_EXTENTS, WORLD_EXTENTS);
+            this.world = new World(this.bodys, Vector3.Scale(WORLD_EXTENTS, 2));
 
             //Cargar shader para esferas
             string compilationErrors;
@@ -74,12 +78,47 @@ namespace Examples.UTNPhysicsEngine.matias
             TgcSceneLoader loaderEscenario = new TgcSceneLoader();
             loaderEscenario.MeshFactory = new CustomMeshShaderFactory();
             TgcScene scene = loaderEscenario.loadSceneFromFile(GuiController.Instance.ExamplesMediaDir + "CanchaBasket\\CanchaBasket-TgcScene.xml");
+            
+
+            //Separar meshes segun layer
             this.meshesEscenario = new List<TgcMeshShader>();
+            this.rigidBoxes = new List<BoxBody>();
+            this.invisibleSpheres = new List<SphereBody>();
             foreach (TgcMeshShader m in scene.Meshes)
             {
                 m.Effect = effectSphere;
-                this.meshesEscenario.Add(m);
+                
+                //Cajas rigidas
+                if (m.Layer == "boundingBox")
+                {
+                    //Crear Box para colision
+                    BoxBody body = new BoxBody(Matrix.Identity, m.BoundingBox.calculateAxisRadius(), m.BoundingBox.calculateBoxCenter(), new Vector3(0, 0, 0), new Vector3(0, 0, 0), 0f);
+                    this.world.addBody(body);
+                    this.rigidBoxes.Add(body);
+
+                    //Son visibles
+                    this.meshesEscenario.Add(m);
+                }
+                //Esferas rigidas invisibles
+                else if (m.Layer == "boundingSphereInvisibles")
+                {
+                    SphereBody body = new SphereBody(0.118f, m.BoundingBox.calculateBoxCenter(), new Vector3(0, 0, 0), new Vector3(0, 0, 0), 0f, false);
+                    body.restitution = 0.8f;
+                    this.world.addBody(body);
+                    this.invisibleSpheres.Add(body);
+                }
+                //Demas objetos de adorno del escenario
+                else
+                {
+                    //Son visibles
+                    this.meshesEscenario.Add(m);
+                }
+
             }
+
+            //Optimizar objetos estaticos
+            world.optimize();
+
 
 
 
@@ -89,48 +128,48 @@ namespace Examples.UTNPhysicsEngine.matias
             SphereType sphereType;
             TgcSceneLoader loader = new TgcSceneLoader();
             loader.MeshFactory = new CustomMeshShaderFactory();
-            
-            //Basket
+
+            //Basket: 24.257 cm diametro, 650g
             sphereType = new SphereType();
             sphereType.mesh = (TgcMeshShader)loader.loadSceneFromFile(GuiController.Instance.ExamplesMediaDir + "Balls\\Basketball\\Basketball-TgcScene.xml").Meshes[0];
             sphereType.mesh.AutoTransformEnable = false;
             sphereType.mesh.Effect = effectSphere;
-            sphereType.radius = 20f;
-            sphereType.mass = 20f;
-            sphereType.restitution = 0.8f;
+            sphereType.radius = 0.24257f / 2;
+            sphereType.mass = 0.65f;
+            sphereType.restitution = 0.85f;
             sphereTypes[0] = sphereType;
 
-            //Tennis
+            //Tennis, 6.7cm diametro, 60g
             sphereType = new SphereType();
             sphereType.mesh = (TgcMeshShader)loader.loadSceneFromFile(GuiController.Instance.ExamplesMediaDir + "Balls\\Tennis\\Tennis-TgcScene.xml").Meshes[0];
             sphereType.mesh.AutoTransformEnable = false;
             sphereType.mesh.Effect = effectSphere;
-            sphereType.radius = 5f;
-            sphereType.mass = 5f;
-            sphereType.restitution = 0.9f;
+            sphereType.radius = 0.067f / 2;
+            sphereType.mass = 0.06f;
+            sphereType.restitution = 0.85f;
             sphereTypes[1] = sphereType;
 
-            //Soccer
+            //Soccer, 22cm diametro, 450g
             sphereType = new SphereType();
             sphereType.mesh = (TgcMeshShader)loader.loadSceneFromFile(GuiController.Instance.ExamplesMediaDir + "Balls\\Soccer\\Soccer-TgcScene.xml").Meshes[0];
             sphereType.mesh.AutoTransformEnable = false;
             sphereType.mesh.Effect = effectSphere;
-            sphereType.radius = 16f;
-            sphereType.mass = 16f;
-            sphereType.restitution = 0.7f;
+            sphereType.radius = 0.22f / 2;
+            sphereType.mass = 0.45f;
+            sphereType.restitution = 0.6f;
             sphereTypes[2] = sphereType;
             
 
 
             //Camera
             GuiController.Instance.FpsCamera.Enable = true;
-            GuiController.Instance.FpsCamera.MovementSpeed = 150f;
-            GuiController.Instance.FpsCamera.JumpSpeed = 150f;
-            GuiController.Instance.FpsCamera.setCamera(new Vector3(-worldSize, worldSize, -worldSize), new Vector3(worldSize, -worldSize, worldSize));
+            GuiController.Instance.FpsCamera.MovementSpeed = 5;
+            GuiController.Instance.FpsCamera.JumpSpeed = 5f;
+            GuiController.Instance.FpsCamera.setCamera(new Vector3(0, -WORLD_EXTENTS.Y + 1f, 0), new Vector3(0, -WORLD_EXTENTS.Y + 1f, 1));
 
 
             //Mesh para la luz
-            lightMesh = TgcBox.fromSize(new Vector3(0, 250, 0), new Vector3(10, 10, 10), Color.Red);
+            lightMesh = TgcBox.fromSize(new Vector3(0, WORLD_EXTENTS.Y / 2f, 0), new Vector3(1, 1, 1), Color.Red);
 
         }
 
@@ -175,7 +214,7 @@ namespace Examples.UTNPhysicsEngine.matias
             //Cargar variables shader de la luz
             effectSphere.SetValue("lightColor", ColorValue.FromColor(Color.White));
             effectSphere.SetValue("lightPosition", TgcParserUtils.vector3ToFloat4Array(lightMesh.Position));
-            effectSphere.SetValue("lightIntensity", 20f);
+            effectSphere.SetValue("lightIntensity", 2f);
             effectSphere.SetValue("lightAttenuation", 0.2f);
 
             //Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
@@ -210,7 +249,7 @@ namespace Examples.UTNPhysicsEngine.matias
             lightMesh.render();
 
             //Dibujar limites del escenario
-            limitsWorld.render();
+            //limitsWorld.render();
 
         }
 

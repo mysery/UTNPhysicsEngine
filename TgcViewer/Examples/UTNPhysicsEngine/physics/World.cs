@@ -43,7 +43,7 @@ namespace Examples.UTNPhysicsEngine.physics
         public bool debugMode = false;
         public bool applyRay = false;
 
-        public World(List<Body> bodys, float worldSize, float indexSizeCell=0.1f)
+        public World(List<Body> bodys, float worldSize, float indexSizeCell = 0.1f, float indexScale = 1f)
         {
             this.bodys = bodys;
             this.worldSize = new Vector3(worldSize, worldSize, worldSize);
@@ -68,10 +68,10 @@ namespace Examples.UTNPhysicsEngine.physics
             planesLimits[5] = new PlaneBody(new Plane(-1, 0, 0, -worldSize), new Vector3(-worldSize, 0, 0), new Vector3(), new Vector3(), 0f);
             planesLimits[5].idCode = planesLimits[0].idCode;
 
-            this._spatialHash = new SpatialHash(this.worldSize * indexSizeCell, 2000);
+            this._spatialHash = new SpatialHash(this.worldSize * indexSizeCell * indexScale, indexScale);
         }
 
-        public World(List<Body> bodys, Vector3 worldSize, float indexSizeCell=0.1f)
+        public World(List<Body> bodys, Vector3 worldSize, float indexSizeCell=0.1f, float indexScale=1f)
         {
             this.bodys = bodys;
             this.worldSize = worldSize;
@@ -96,7 +96,7 @@ namespace Examples.UTNPhysicsEngine.physics
             planesLimits[5] = new PlaneBody(new Plane(-1, 0, 0, -worldSize.X), new Vector3(-worldSize.X, 0, 0), new Vector3(), new Vector3(), 0f);
             planesLimits[5].idCode = planesLimits[0].idCode;
 
-            this._spatialHash = new SpatialHash(this.worldSize * indexSizeCell, 2000);
+            this._spatialHash = new SpatialHash(this.worldSize * indexSizeCell * indexScale, indexScale);
         }
         
         internal void optimize()

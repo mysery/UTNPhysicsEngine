@@ -25,7 +25,6 @@ namespace Examples.UTNPhysicsEngine.matias
         //Cancha de basket: 28.65m by 15.24m
         private readonly Vector3 WORLD_EXTENTS = new Vector3(20, 20, 25);
 
-
         private World world;
         private TgcBoundingBox limitsWorld;
         private List<Body> bodys;
@@ -65,7 +64,7 @@ namespace Examples.UTNPhysicsEngine.matias
             //World
             this.bodys = new List<Body>();
             this.limitsWorld = new TgcBoundingBox(-WORLD_EXTENTS, WORLD_EXTENTS);
-            this.world = new World(this.bodys, Vector3.Scale(WORLD_EXTENTS, 2));
+            this.world = new World(this.bodys, WORLD_EXTENTS, 0.1f, 10f);
             this.world.timeSteps = 0.25f;
 
             //Cargar shader para esferas
@@ -205,7 +204,7 @@ namespace Examples.UTNPhysicsEngine.matias
             camera.MovementSpeed = 0.1f;
             camera.JumpSpeed = 0.1f;
             camera.RotationSpeed = 4f;
-            camera.setCamera(new Vector3(0, -WORLD_EXTENTS.Y + 1f, 0), new Vector3(0, -WORLD_EXTENTS.Y + 1f, 1));
+            camera.setCamera(new Vector3(0, -WORLD_EXTENTS.Y + 1f, 0), new Vector3(0, -WORLD_EXTENTS.Y + 1f, -1));
 
 
             //Mesh para la luz
@@ -222,8 +221,7 @@ namespace Examples.UTNPhysicsEngine.matias
         {
             //compute: integrate position, collition detect, contacts solvers
             world.step(elapsedTime);
-
-
+            
             //Agregar nueva esfera
             if (GuiController.Instance.D3dInput.buttonPressed(TgcD3dInput.MouseButtons.BUTTON_RIGHT))
             {
@@ -276,6 +274,11 @@ namespace Examples.UTNPhysicsEngine.matias
             bool cajon = (bool)GuiController.Instance.Modifiers["cajon"];
             if (cajon)
             {
+                if (!tapaMovilMesh.Enabled)
+                {
+                    tapaMovilMesh.Enabled = true;
+                    world.addBody(tapaMovilBody);
+                }
                 tapaMovilMesh.render();
             }
             else

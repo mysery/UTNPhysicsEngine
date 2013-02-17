@@ -11,13 +11,13 @@ namespace Examples.UTNPhysicsEngine.optimizacion.spatialHash
     public class SpatialHash
     {
         private Vector3 _cellSize;
-        private uint _maxBuckets;
+        private float _indexScale;
         private Dictionary<SpatialHashKey, SpatialHashBucket> _hash = new Dictionary<SpatialHashKey, SpatialHashBucket>();
 
-        public SpatialHash(Vector3 cellSize, uint maxBuckets)
+        public SpatialHash(Vector3 cellSize, float indexScale)
         {
             _cellSize = cellSize;
-            _maxBuckets = maxBuckets;
+            _indexScale = indexScale;
         }
 
         public void clear(int capacity)
@@ -27,8 +27,8 @@ namespace Examples.UTNPhysicsEngine.optimizacion.spatialHash
 
         public void add(Vector3 aabb_min, Vector3 aabb_max, Body body)
         {
-            SpatialHashKey key_min = new SpatialHashKey(_cellSize, aabb_min);
-            SpatialHashKey key_max = new SpatialHashKey(_cellSize, aabb_max);
+            SpatialHashKey key_min = new SpatialHashKey(_cellSize, aabb_min * _indexScale);
+            SpatialHashKey key_max = new SpatialHashKey(_cellSize, aabb_max * _indexScale);
             for (long cz = key_min.cell_z; cz <= key_max.cell_z; ++cz)
                 for (long cy = key_min.cell_y; cy <= key_max.cell_y; ++cy)
                     for (long cx = key_min.cell_x; cx <= key_max.cell_x; ++cx)
@@ -37,8 +37,8 @@ namespace Examples.UTNPhysicsEngine.optimizacion.spatialHash
 
         public void remove(Vector3 aabb_min, Vector3 aabb_max, Body body)
         {
-            SpatialHashKey key_min = new SpatialHashKey(_cellSize, aabb_min);
-            SpatialHashKey key_max = new SpatialHashKey(_cellSize, aabb_max);
+            SpatialHashKey key_min = new SpatialHashKey(_cellSize, aabb_min * _indexScale);
+            SpatialHashKey key_max = new SpatialHashKey(_cellSize, aabb_max * _indexScale);
             for (long cz = key_min.cell_z; cz <= key_max.cell_z; ++cz)
                 for (long cy = key_min.cell_y; cy <= key_max.cell_y; ++cy)
                     for (long cx = key_min.cell_x; cx <= key_max.cell_x; ++cx)
@@ -47,10 +47,10 @@ namespace Examples.UTNPhysicsEngine.optimizacion.spatialHash
  
         public void update(SpatialHashAABB old_aabb, SpatialHashAABB new_aabb, Body body)
         {
-            SpatialHashKey old_key_min = new SpatialHashKey(_cellSize, old_aabb.aabbMin);
-            SpatialHashKey old_key_max = new SpatialHashKey(_cellSize, old_aabb.aabbMax);
-            SpatialHashKey new_key_min = new SpatialHashKey(_cellSize, new_aabb.aabbMin);
-            SpatialHashKey new_key_max = new SpatialHashKey(_cellSize, new_aabb.aabbMax);
+            SpatialHashKey old_key_min = new SpatialHashKey(_cellSize, old_aabb.aabbMin * _indexScale);
+            SpatialHashKey old_key_max = new SpatialHashKey(_cellSize, old_aabb.aabbMax * _indexScale);
+            SpatialHashKey new_key_min = new SpatialHashKey(_cellSize, new_aabb.aabbMin * _indexScale);
+            SpatialHashKey new_key_max = new SpatialHashKey(_cellSize, new_aabb.aabbMax * _indexScale);
 
             if (old_key_min.Equals(new_key_min) && old_key_max.Equals(new_key_max))
                 return;
@@ -77,8 +77,8 @@ namespace Examples.UTNPhysicsEngine.optimizacion.spatialHash
         public ArrayList getNeighbors(Vector3 aabb_min, Vector3 aabb_max)
         {
             ArrayList result = new ArrayList();
-            SpatialHashKey key_min = new SpatialHashKey(_cellSize, aabb_min);
-            SpatialHashKey key_max = new SpatialHashKey(_cellSize, aabb_max);
+            SpatialHashKey key_min = new SpatialHashKey(_cellSize, aabb_min * _indexScale);
+            SpatialHashKey key_max = new SpatialHashKey(_cellSize, aabb_max * _indexScale);
             for (long cz = key_min.cell_z; cz <= key_max.cell_z; ++cz)
                 for (long cy = key_min.cell_y; cy <= key_max.cell_y; ++cy)
                     for (long cx = key_min.cell_x; cx <= key_max.cell_x; ++cx)

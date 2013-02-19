@@ -13,20 +13,20 @@ namespace Examples.UTNPhysicsEngine.optimizacion.spatialHash
         public long cell_z;
         public Vector3 cellSize;
         
-        public SpatialHashKey(uint cellSize, Vector3 point)
+        public SpatialHashKey(Vector3 _maxSize, float cellSize, Vector3 point)
         {
             this.cellSize = new Vector3(cellSize, cellSize, cellSize);
-            this.cell_x = (long)point.X / (long)this.cellSize.X;
-            this.cell_y = (long)point.Y / (long)this.cellSize.Y;
-            this.cell_z = (long)point.Z / (long)this.cellSize.Z;
+            this.cell_x = (long)(point.X / this.cellSize.X) + (long)_maxSize.X / 2;
+            this.cell_y = (long)(point.Y / this.cellSize.Y) + (long)_maxSize.Y / 2;
+            this.cell_z = (long)(point.Z / this.cellSize.Z) + (long)_maxSize.Z / 2;
         }
 
-        public SpatialHashKey(Vector3 cellSize, Vector3 point)
+        public SpatialHashKey(Vector3 _maxSize, Vector3 cellSize, Vector3 point)
         {
             this.cellSize = cellSize;
-            this.cell_x = (long) point.X / (long) this.cellSize.X;
-            this.cell_y = (long) point.Y / (long) this.cellSize.Y;
-            this.cell_z = (long) point.Z / (long) this.cellSize.Z;
+            this.cell_x = (long)(point.X / this.cellSize.X) + (long)_maxSize.X / 2;
+            this.cell_y = (long)(point.Y / this.cellSize.Y) + (long)_maxSize.Y / 2;
+            this.cell_z = (long)(point.Z / this.cellSize.Z) + (long)_maxSize.Z / 2;
         }
 
         public SpatialHashKey(long cx, long cy, long cz)

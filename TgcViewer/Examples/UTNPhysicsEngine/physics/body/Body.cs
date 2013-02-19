@@ -20,6 +20,8 @@ namespace Examples.UTNPhysicsEngine.physics.body
 
         private SpatialHashAABB _aabb;
         public Vector3 lastUpdatePosition;
+        public Matrix lastRotation;
+
 
         private Matrix _Ibody; //Inertia tensor del cuerpo constante durante lo que vive el cuerpo, para las rotaciones.
         private Matrix _InvIbody; //Inversa de inertia tensor del cuerpo constante durante lo que vive el cuerpo, para las rotaciones.
@@ -48,6 +50,7 @@ namespace Examples.UTNPhysicsEngine.physics.body
             this.lastUpdatePosition = position;
             this.quaternion = Quaternion.Identity;// RotationMatrix(Matrix.Identity);
             this.scaling = Matrix.Scaling(1f,1f,1f);
+            this.lastRotation = Matrix.Identity;
             this.velocity = velocity;
             this.angularVelocity = Vector3.Empty;
             this.aceleracion = aceleracion;
@@ -67,9 +70,9 @@ namespace Examples.UTNPhysicsEngine.physics.body
         public Matrix getTrasform()
         {
             //this.quaternion.Normalize();
-            return Matrix.Identity * scaling * Matrix.RotationQuaternion(quaternion) * Matrix.Translation(position);
+            return Matrix.Identity * scaling * Matrix.RotationQuaternion(quaternion) * lastRotation * Matrix.Translation(position); //hack last rotation.
         }
-
+        
         internal CordinateSystem wordCordSys()
         {
             return new CordinateSystem(new Quaternion(quaternion.X, quaternion.Y, quaternion.Z, quaternion.W), new Vector3(position.X, position.Y, position.Z));
@@ -99,6 +102,7 @@ namespace Examples.UTNPhysicsEngine.physics.body
 
         public virtual void integrateVelocitySI(float timeStep)
         {
+            lastUpdatePosition = this.position;
             this.position.Add(Vector3.Multiply(this.velocity, timeStep));
             
             float AngularMotionTreshold = 0.5f * FastMath.PI_HALF;

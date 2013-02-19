@@ -17,7 +17,6 @@ namespace Examples.UTNPhysicsEngine.physics
     {
         //private Octree _octree;
         private SpatialHash _spatialHash;
-        private float updatePostionDistance;
 
         /*public Octree Octree
         {
@@ -68,7 +67,7 @@ namespace Examples.UTNPhysicsEngine.physics
             planesLimits[5] = new PlaneBody(new Plane(-1, 0, 0, -worldSize), new Vector3(-worldSize, 0, 0), new Vector3(), new Vector3(), 0f);
             planesLimits[5].idCode = planesLimits[0].idCode;
 
-            this._spatialHash = new SpatialHash(this.worldSize * indexSizeCell * indexScale, indexScale);
+            this._spatialHash = new SpatialHash(this.worldSize * 2, this.worldSize * indexSizeCell * indexScale, indexScale);
         }
 
         public World(List<Body> bodys, Vector3 worldSize, float indexSizeCell=0.1f, float indexScale=1f)
@@ -96,7 +95,10 @@ namespace Examples.UTNPhysicsEngine.physics
             planesLimits[5] = new PlaneBody(new Plane(-1, 0, 0, -worldSize.X), new Vector3(-worldSize.X, 0, 0), new Vector3(), new Vector3(), 0f);
             planesLimits[5].idCode = planesLimits[0].idCode;
 
-            this._spatialHash = new SpatialHash(this.worldSize * indexSizeCell * indexScale, indexScale);
+            this._spatialHash = new SpatialHash(new Vector3(this.worldSize.X / (this.worldSize.X * indexSizeCell) * 2 + 4,
+                                                            this.worldSize.Y/(this.worldSize.Y*indexSizeCell)*2 + 4,
+                                                            this.worldSize.Z/(this.worldSize.Z*indexSizeCell)*2 + 4), 
+                                                            this.worldSize * indexSizeCell * indexScale, indexScale);
         }
         
         internal void optimize()

@@ -64,7 +64,7 @@ namespace Examples.UTNPhysicsEngine.matias
             //World
             this.bodys = new List<Body>();
             this.limitsWorld = new TgcBoundingBox(-WORLD_EXTENTS, WORLD_EXTENTS);
-            this.world = new World(this.bodys, WORLD_EXTENTS, 0.1f, 10f);
+            this.world = new World(this.bodys, WORLD_EXTENTS, 0.05f);
             this.world.timeSteps = 0.25f;
 
             //Cargar shader para esferas
@@ -250,10 +250,13 @@ namespace Examples.UTNPhysicsEngine.matias
             //Render balas
             foreach (SphereElement sphereElement in this.sphereElements)
             {
+                //Hack rotacion.
+                Vector3 rotacion = Vector3.Normalize(new Vector3(sphereElement.body.velocity.Z, 0, -sphereElement.body.velocity.X));
+                float angulo = (sphereElement.body.position - sphereElement.body.lastUpdatePosition).Length() / sphereElement.body.Radius;
+                sphereElement.body.lastRotation = sphereElement.body.lastRotation * Matrix.RotationAxis(rotacion, angulo);
                 //Aplicar transformacion al mesh
                 Matrix matWorld = sphereElement.body.getTrasform();
                 sphereElement.type.mesh.Transform = matWorld;
-
                 //Render mesh
                 sphereElement.type.mesh.render();
 

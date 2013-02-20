@@ -360,7 +360,7 @@ namespace Examples.UTNPhysicsEngine.physics
             bounds[0] = -boxShape.extendend;
             bounds[1] = boxShape.extendend;
 
-            margins = boxShape.margin + s.margin; //also add sphereShape margin?
+            margins = boxShape.margin + s.margin;
 
             CordinateSystem boxWSCoord = boxShape.wordCordSys();
 

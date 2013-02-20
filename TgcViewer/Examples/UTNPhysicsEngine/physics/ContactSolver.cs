@@ -8,7 +8,7 @@ namespace Examples.UTNPhysicsEngine.physics
 {
     static class ContactSolver
     {
-        private static float EPSILON_FOR_IMPULSE = 0.001f;
+        private static float EPSILON_FOR_IMPULSE = 0.0001f;
 
         internal static void solveSimpleContact(Contact c, float timeStep)
         {

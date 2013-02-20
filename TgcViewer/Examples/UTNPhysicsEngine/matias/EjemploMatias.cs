@@ -257,7 +257,7 @@ namespace Examples.UTNPhysicsEngine.matias
             {
                 //Hack rotacion.
                 Vector3 rotacion = Vector3.Normalize(new Vector3(sphereElement.body.velocity.Z, 0, -sphereElement.body.velocity.X));
-                float angulo = (new Vector3(sphereElement.body.position.X,0,sphereElement.body.position.Z) - new Vector3(sphereElement.body.lastUpdatePosition.X,0,sphereElement.body.lastUpdatePosition.Z)).Length() / sphereElement.body.Radius*1.3f;
+                float angulo = (new Vector3(sphereElement.body.position.X,0,sphereElement.body.position.Z) - new Vector3(sphereElement.body.lastUpdatePosition.X,0,sphereElement.body.lastUpdatePosition.Z)).Length() / sphereElement.body.Radius*1.5f;
                 if (rotacion.Length()>float.Epsilon)
                     sphereElement.body.lastRotation = sphereElement.body.lastRotation * Matrix.RotationAxis(rotacion, angulo);
                 //Aplicar transformacion al mesh

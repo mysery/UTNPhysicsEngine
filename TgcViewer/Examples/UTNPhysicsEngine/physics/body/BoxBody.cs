@@ -11,7 +11,7 @@ namespace Examples.UTNPhysicsEngine.physics.body
 {
     class BoxBody : Body
     {
-        public float margin = 0.004f; //Para tener un margen de error en las collisiones.
+        public float margin = 0.01f; //Para tener un margen de error en las collisiones.
         public Vector3 localCenter;
         public Matrix direction; // Local xyz en local space, M(1,:) en Eje X ; M(2,:) en Eje Y ; M(3,:) en Eje Z. conforma una base.
         public Vector3 extendend; // Positive halfwidth extents of OBB along each axis

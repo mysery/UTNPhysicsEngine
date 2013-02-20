@@ -12,7 +12,7 @@ namespace Examples.UTNPhysicsEngine.physics.body
     public class SphereBody : Body
     {
         public float radius;
-        public float margin = 0.04f; //Para tener un margen de error en las collisiones.
+        public float margin = 0.01f; //Para tener un margen de error en las collisiones.
 
         public SphereBody(float radius, Vector3 position, Vector3 velocity, Vector3 aceleracion, float mass, bool applyGravity = true)
             : base(position, velocity, aceleracion, mass, applyGravity)

@@ -7,6 +7,7 @@ namespace Examples.UTNPhysicsEngine
 {
     public static class Constant
     {
+        //Modifiers
         public static string pause = "Pausa";
         public static string pause_text = "Simulacion pausada";
         public static string debug = "debug";
@@ -23,6 +24,10 @@ namespace Examples.UTNPhysicsEngine
         public static string gravity_text = "Aplica la gravedad\n normal al cuerpo";
         public static string acceleration = "Vector aceleracion";
         public static string restitution ="Coeficiente de rebote";
+
+        //Vars
+        public static string objectCount = "Cantidad Objetos";
+        public static string contactCount = "Cantidad Contactos";
 
         
     }

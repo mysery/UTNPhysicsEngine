@@ -41,6 +41,8 @@ namespace Examples.UTNPhysicsEngine.physics.body
             this.extendend = extendend;
             this.scaling = Matrix.Scaling(extendend.X * 2f, extendend.Y * 2f, extendend.Z * 2f);
             this.localCenter = new Vector3();
+
+            this.calculateAABB();
         }
 
         public Vector3 Center

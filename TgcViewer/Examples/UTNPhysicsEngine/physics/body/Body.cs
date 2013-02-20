@@ -59,6 +59,8 @@ namespace Examples.UTNPhysicsEngine.physics.body
             this.invMass = mass != 0f ? 1.0f / mass : 0.0f;
             if (applyGravity)
                 this.aceleracion += new Vector3(0.0f, -9.8f, 0.0f) * mass;
+
+            this.calculateAABB();
         }
         //Esto lo tengo que hacer asi porque en C# no se puede invocar en orden a los constructores. mal...
         public abstract void calculateInertiaBody();
@@ -177,7 +179,8 @@ namespace Examples.UTNPhysicsEngine.physics.body
         {
             get
             {
-                { calculateAABB();}
+                if (this.mass != 0f)
+                    calculateAABB();
                 return _aabb;
             }
             set { _aabb = value; }

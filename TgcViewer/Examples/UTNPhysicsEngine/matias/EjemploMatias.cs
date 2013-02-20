@@ -216,6 +216,10 @@ namespace Examples.UTNPhysicsEngine.matias
             GuiController.Instance.Modifiers.addInterval("objeto", new string[] { "Basket", "Tenis", "Futbol" }, 0);
             GuiController.Instance.Modifiers.addInterval("cantidad", new string[] { "1", "2", "3", "4", "5", "10" }, 0);
             GuiController.Instance.Modifiers.addBoolean("cajon", "cajon", true);
+
+            //Variables.
+            GuiController.Instance.UserVars.addVar(Constant.objectCount);
+            GuiController.Instance.UserVars.addVar(Constant.contactCount);
         }
 
         public override void render(float elapsedTime)
@@ -296,7 +300,8 @@ namespace Examples.UTNPhysicsEngine.matias
             }
 
 
-
+            GuiController.Instance.UserVars.setValue(Constant.objectCount, world.bodys.Count);
+            GuiController.Instance.UserVars.setValue(Constant.contactCount, world.contacts.Count);
             //Dibujar limites del escenario
             //limitsWorld.render();
 

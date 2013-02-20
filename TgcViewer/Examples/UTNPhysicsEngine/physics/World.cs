@@ -31,10 +31,10 @@ namespace Examples.UTNPhysicsEngine.physics
         private const float FIXED_TIME_STEP = 1f / 60f;
         private float localTime = FIXED_TIME_STEP;
         
-        private List<Body> bodys;
+        public List<Body> bodys;
         private Vector3 worldSize;
         //private ISet<Contact> contacts = new HashSet<Contact>(new ContactComparer());
-        private ArrayList contacts = new ArrayList();//<Contact>();//new ContactComparer());
+        public ArrayList contacts = new ArrayList();//<Contact>();//new ContactComparer());
         private PlaneBody[] planesLimits = new PlaneBody[6];
         private TgcPickingRay pickingRay;
 

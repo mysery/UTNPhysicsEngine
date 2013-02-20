@@ -19,6 +19,8 @@ namespace Examples.UTNPhysicsEngine.physics.body
         {
             this.radius = radius;
             this.scaling = Matrix.Scaling(radius, radius, radius);
+
+            this.calculateAABB();
         }
 
         public Vector3 Center

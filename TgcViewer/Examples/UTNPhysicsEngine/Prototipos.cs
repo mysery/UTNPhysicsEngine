@@ -88,7 +88,8 @@ namespace Examples
             GuiController.Instance.Modifiers.addVertex3f(Constant.acceleration, new Vector3(-10f, -10f, -10f), new Vector3(10f, 10f, 10f), new Vector3());
             GuiController.Instance.Modifiers.addFloat(Constant.mass, 0f, 10f, 1f);
             GuiController.Instance.Modifiers.addFloat(Constant.restitution, 0.1f, 1f, 1f);
-
+            GuiController.Instance.UserVars.addVar(Constant.objectCount);
+            GuiController.Instance.UserVars.addVar(Constant.contactCount);
             //Materials.
             sphereMat[0].Ambient = Color.DarkRed;
             sphereMat[0].Diffuse = Color.Red;
@@ -202,6 +203,9 @@ namespace Examples
                     world.debugContacts.RemoveRange(0, world.debugContacts.Count/8);
                 }
             }
+
+            GuiController.Instance.UserVars.setValue(Constant.objectCount, world.bodys.Count);
+            GuiController.Instance.UserVars.setValue(Constant.contactCount, world.contacts.Count);
         }
 
         public void close()

@@ -20,12 +20,12 @@ namespace Examples
 
         public override string getCategory()
         {
-            return "UTNPhysicsEngine";
+            return "Prototipos abstractos";
         }
 
         public override string getName()
         {
-            return "10 ejemplo del UTNPhysicsEngine";
+            return "10 ejemplo con cajas rotadas y esferas";
         }
 
         public override string getDescription()
@@ -77,10 +77,10 @@ namespace Examples
             box = new BoxBody(m, halfExtend, new Vector3(40f, 50f, 40f), new Vector3(), new Vector3(), 0f);
             proto.Bodys.Add(box);
 
-            m.M11 = 0f;
-            m.M22 = 0f;
-            m.M33 = 0f;
-            box = new BoxBody(m, halfExtend, new Vector3(40f, 40f, -40f), new Vector3(), new Vector3(), 0f);
+            m.M11 = 1f;
+            m.M22 = 1f;
+            m.M33 = 1f;
+            box = new BoxBody(m, halfExtend, new Vector3(140f, 0, -140f), new Vector3(), new Vector3(), 0f);
             proto.Bodys.Add(box);
 
             #region Spheres

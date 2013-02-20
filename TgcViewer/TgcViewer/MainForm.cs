@@ -61,7 +61,7 @@ namespace TgcViewer
                     guiController.render();
                 }
                 //Contemplar también la ventana del modo FullScreen
-                else if (this.FullScreenEnable && guiController.FullScreenPanel.ContainsFocus)
+                else if (guiController.FullScreenPanel.ContainsFocus)
                 {
                     guiController.render();
                 }
@@ -167,7 +167,7 @@ namespace TgcViewer
 
         private void camaraPrimeraPersonaToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GuiController.Instance.FpsCamera.Enable = camaraPrimeraPersonaToolStripMenuItem.Checked;
+            //GuiController.Instance.FpsCamera.Enable = camaraPrimeraPersonaToolStripMenuItem.Checked;
         }
 
         private void contadorFPSToolStripMenuItem_Click(object sender, EventArgs e)
@@ -211,7 +211,7 @@ namespace TgcViewer
         /// </summary>
         internal void resetMenuOptions()
         {
-            camaraPrimeraPersonaToolStripMenuItem.Checked = false;
+            //camaraPrimeraPersonaToolStripMenuItem.Checked = false;
             wireframeToolStripMenuItem.Checked = false;
             contadorFPSToolStripMenuItem.Checked = true;
             ejesCartesianosToolStripMenuItem.Checked = true;
@@ -222,8 +222,7 @@ namespace TgcViewer
         /// </summary>
         internal bool FullScreenEnable
         {
-            get { return ejecutarEnFullScreenToolStripMenuItem.Checked; }
-            set { ejecutarEnFullScreenToolStripMenuItem.Checked = value; }
+            get { return false; }          
         }
 
         internal void removePanel3dFromMainForm()

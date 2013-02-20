@@ -17,28 +17,28 @@ namespace Examples.Otros
     /// <summary>
     /// Ejemplo default con logo de TGC
     /// </summary>
-    public class EjemploDefault : TgcExample
+    public class EjemploDefault
     {
         TgcMeshShader mesh;
         float[] lightPos = new float[]{0, 50, 300};
         InterpoladorVaiven interp;
 
-        public override string getCategory()
+        public string getCategory()
         {
             return "Otros";
         }
 
-        public override string getName()
+        public string getName()
         {
             return "Logo de TGC";
         }
 
-        public override string getDescription()
+        public string getDescription()
         {
             return "Logo de TGC";
         }
 
-        public override void init()
+        public void init()
         {/*
             Device d3dDevice = GuiController.Instance.D3dDevice;
 
@@ -71,7 +71,7 @@ namespace Examples.Otros
         }
 
 
-        public override void render(float elapsedTime)
+        public void render(float elapsedTime)
         {/*
             Device d3dDevice = GuiController.Instance.D3dDevice;
 
@@ -88,7 +88,7 @@ namespace Examples.Otros
             mesh.render();*/
         }
 
-        public override void close()
+        public void close()
         {/*
             mesh.Effect.Dispose();
             mesh.dispose();*/

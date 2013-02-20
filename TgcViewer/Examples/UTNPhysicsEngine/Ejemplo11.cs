@@ -20,17 +20,17 @@ namespace Examples
 
         public override string getCategory()
         {
-            return "UTNPhysicsEngine";
+            return "Prototipos abstractos";
         }
 
         public override string getName()
         {
-            return "11 ejemplo del UTNPhysicsEngine";
+            return "11 ejemplo cajas alineadas y esferas";
         }
 
         public override string getDescription()
         {
-            return "Decimo ejemplo del UTNPhysicsEngine";
+            return "Onceavo ejemplo del UTNPhysicsEngine";
         }
 
         private Prototipos proto = new Prototipos();
@@ -39,13 +39,13 @@ namespace Examples
         {
             #region Box
             Matrix m = new Matrix();
-            m.M11 = 1f; m.M12 = 0f;m.M13 = 0f;
-            m.M21 = 0f; m.M22 = 1f;m.M23 = 0f;
+            m.M11 = 1f; m.M12 = 0.1f;m.M13 = 0f;
+            m.M21 = -0.1f; m.M22 = 1f;m.M23 = -0.1f;
             m.M31 = 0f; m.M32 = 0f;m.M33 = 1f;
             Vector3 halfExtend = new Vector3(20f, 20f, 20f);
             // creo una grilla de cuerpos.
             int numberBoxPerSide = 12;            
-            float separationBetweenBox = 8.0f;
+            float separationBetweenBox = 1.0f;
 
             float xCentre = 0f;
             float zCentre = 0f;

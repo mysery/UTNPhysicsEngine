@@ -20,12 +20,12 @@ namespace Examples
     {
         public override string getCategory()
         {
-            return "UTNPhysicsEngine";
+            return "Prototipos abstractos";
         }
 
         public override string getName()
         {
-            return "02 ejemplo del UTNPhysicsEngine";
+            return "02 ejemplo esferas con velocidad aleatoria";
         }
 
         public override string getDescription()
@@ -40,11 +40,11 @@ namespace Examples
             const float radius = 20.0f;
 
             Random r = new Random(123456);
-            for (int i = 0; i < 3; ++i)
+            for (int i = 0; i < 5; ++i)
 	        {
-		        for (int j = 0; j < 3; j++)
+		        for (int j = 0; j < 5; j++)
 		        {
-                    for (int k = 0; k < 3; k++)
+                    for (int k = 0; k < 5; k++)
                     {
                         SphereBody sphereLeft = new SphereBody( radius,
                                                                 new Vector3(-proto.WorldSize.X / 2 + i * radius * 4, -proto.WorldSize.Y / 2 + j * radius * 4, -proto.WorldSize.Z / 2 + k * radius * 4),

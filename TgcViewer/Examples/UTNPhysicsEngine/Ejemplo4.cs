@@ -20,12 +20,12 @@ namespace Examples
 
         public override string getCategory()
         {
-            return "UTNPhysicsEngine";
+            return "Prototipos abstractos";
         }
 
         public override string getName()
         {
-            return "04 ejemplo del UTNPhysicsEngine";
+            return "04 ejemplo esferas diferente masa";
         }
 
         public override string getDescription()
@@ -51,7 +51,7 @@ namespace Examples
                                                                 new Vector3(),
                                                                 //new Vector3((float)r.Next(-2, 2), (float)r.Next(-2, 2), (float)r.Next(-2, 2)),
                                                                 new Vector3(),
-                                                                1f);
+                                                                radius[i]);
                         proto.Bodys.Add(sphereLeft);
                     }
                }

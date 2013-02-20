@@ -20,12 +20,12 @@ namespace Examples
 
         public override string getCategory()
         {
-            return "UTNPhysicsEngine";
+            return "Prototipos abstractos";
         }
 
         public override string getName()
         {
-            return "00 ejemplo del UTNPhysicsEngine";
+            return "00 Ejemplo vacio";
         }
 
         public override string getDescription()
@@ -65,7 +65,7 @@ namespace Examples
         public override void render(float elapsedTime)
         {
             proto.render(elapsedTime);
-            if (proto.Bodys.Count == 25)
+            if (proto.Bodys.Count == 1500)
             {
                 Body body = proto.Bodys[0];
                 proto.world.removeBody(body); //El proto y el world tienen la misma lista, con lo cual alcanza con sacarlo de una.

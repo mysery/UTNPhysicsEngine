@@ -142,8 +142,8 @@ namespace TgcViewer
             exampleLoader.loadExamplesInGui(mainForm.TreeViewExamples, new string[] { examplesDir });
 
             //Cargar ejemplo default
-            TgcExample defaultExample = exampleLoader.getExampleByName("Logo de TGC", "Otros");
-            executeExample(defaultExample);
+            //TgcExample defaultExample = exampleLoader.getExampleByName("Logo de TGC", "Otros");
+            //executeExample(defaultExample);
         }
        
         /// <summary>
@@ -629,8 +629,7 @@ namespace TgcViewer
         /// </summary>
         public bool FullScreenEnable
         {
-            get { return mainForm.FullScreenEnable; }
-            set { mainForm.FullScreenEnable = value; }
+            get { return false; }            
         }
 
         /// <summary>

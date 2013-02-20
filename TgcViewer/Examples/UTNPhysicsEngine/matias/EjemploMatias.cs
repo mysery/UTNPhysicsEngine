@@ -43,17 +43,17 @@ namespace Examples.UTNPhysicsEngine.matias
 
         public override string getCategory()
         {
-            return "Matias";
+            return "Prototipo presentación";
         }
 
         public override string getName()
         {
-            return "Ejemplo matias";
+            return "Cancha de Basquet";
         }
 
         public override string getDescription()
         {
-            return "Ejemplo matias";
+            return "El prototipo contiene gran cantidad de modelos prefijados, con las variables para agregar cuerpos definidas segun cada objeto, para la presentacion de UTNPhysicsEngine";
         }
 
 
@@ -126,6 +126,7 @@ namespace Examples.UTNPhysicsEngine.matias
             this.meshesEscenario = new List<TgcMeshShader>();
             this.rigidBoxes = new List<BoxBody>();
             this.invisibleSpheres = new List<SphereBody>();
+            int i = 0;
             foreach (TgcMeshShader m in scene.Meshes)
             {
                 //Setear shader
@@ -171,8 +172,8 @@ namespace Examples.UTNPhysicsEngine.matias
                     SphereElement sphereElement = new SphereElement();
 
                     //Tipo de esfera Basket
-                    sphereElement.type = sphereTypes[0];
-
+                    sphereElement.type = sphereTypes[i++];
+                    i = i % 3;
                     //Crear cuerpo de esfera
                     sphereElement.body = new SphereBody(sphereElement.type.radius, m.BoundingBox.calculateBoxCenter(), new Vector3(0, 0, 0), new Vector3(0, 0, 0), sphereElement.type.mass);
                     sphereElement.body.restitution = sphereElement.type.restitution;
@@ -252,8 +253,9 @@ namespace Examples.UTNPhysicsEngine.matias
             {
                 //Hack rotacion.
                 Vector3 rotacion = Vector3.Normalize(new Vector3(sphereElement.body.velocity.Z, 0, -sphereElement.body.velocity.X));
-                float angulo = (sphereElement.body.position - sphereElement.body.lastUpdatePosition).Length() / sphereElement.body.Radius;
-                sphereElement.body.lastRotation = sphereElement.body.lastRotation * Matrix.RotationAxis(rotacion, angulo);
+                float angulo = (new Vector3(sphereElement.body.position.X,0,sphereElement.body.position.Z) - new Vector3(sphereElement.body.lastUpdatePosition.X,0,sphereElement.body.lastUpdatePosition.Z)).Length() / sphereElement.body.Radius*1.3f;
+                if (rotacion.Length()>float.Epsilon)
+                    sphereElement.body.lastRotation = sphereElement.body.lastRotation * Matrix.RotationAxis(rotacion, angulo);
                 //Aplicar transformacion al mesh
                 Matrix matWorld = sphereElement.body.getTrasform();
                 sphereElement.type.mesh.Transform = matWorld;

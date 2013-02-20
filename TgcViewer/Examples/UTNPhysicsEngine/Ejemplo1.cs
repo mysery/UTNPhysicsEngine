@@ -20,12 +20,12 @@ namespace Examples
 
         public override string getCategory()
         {
-            return "UTNPhysicsEngine";
+            return "Prototipos abstractos";
         }
 
         public override string getName()
         {
-            return "01 ejemplo del UTNPhysicsEngine";
+            return "01 ejemplo con gran cantidad de esferas";
         }
 
         public override string getDescription()

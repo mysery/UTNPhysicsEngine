@@ -11,7 +11,7 @@
     <RootNamespace>TgcViewer</RootNamespace>
     <AssemblyName>TgcViewer</AssemblyName>
     <StartupObject>TgcViewer.Program</StartupObject>
-    <ApplicationIcon>IconoTgc.ico</ApplicationIcon>
+    <ApplicationIcon>utnphysicsengineW7_256px.ico</ApplicationIcon>
     <Win32Resource>
     </Win32Resource>
     <FileUpgradeFlags>
@@ -328,6 +328,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="IconoTgc.ico" />
+    <Content Include="utnphysicsengineW7_256px.ico" />
     <None Include="Resources\dir_icon.jpg" />
   </ItemGroup>
   <ItemGroup>

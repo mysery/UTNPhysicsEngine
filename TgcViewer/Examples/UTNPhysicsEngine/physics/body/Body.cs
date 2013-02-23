@@ -20,6 +20,7 @@ namespace Examples.UTNPhysicsEngine.physics.body
 
         private SpatialHashAABB _aabb;
         public Vector3 lastUpdatePosition;
+        public Quaternion lastUpdateOrientation;
         public Matrix lastRotation;
 
 
@@ -51,6 +52,7 @@ namespace Examples.UTNPhysicsEngine.physics.body
             this.quaternion = Quaternion.Identity;// RotationMatrix(Matrix.Identity);
             this.scaling = Matrix.Scaling(1f,1f,1f);
             this.lastRotation = Matrix.Identity;
+            this.lastUpdateOrientation = this.quaternion;
             this.velocity = velocity;
             this.angularVelocity = Vector3.Empty;
             this.aceleracion = aceleracion;
@@ -102,9 +104,13 @@ namespace Examples.UTNPhysicsEngine.physics.body
                                                     this.invInertiaTensor.M31 * this.torque.X + this.invInertiaTensor.M32 * this.torque.Y + this.invInertiaTensor.M33 * this.torque.Z) * timeStep);*/
         }
 
-        public virtual void integrateVelocitySI(float timeStep)
+        public virtual void integrateVelocitySI(float timeStep, bool cleanState)
         {
-            lastUpdatePosition = this.position;
+            if (cleanState)
+            {
+                lastUpdatePosition = this.position;
+                lastUpdateOrientation = this.quaternion;
+            }
             this.position.Add(Vector3.Multiply(this.velocity, timeStep));
             
             float AngularMotionTreshold = 0.5f * FastMath.PI_HALF;
@@ -187,5 +193,13 @@ namespace Examples.UTNPhysicsEngine.physics.body
         }
 
         public Vector3 LastUpdatePosition { get; set; }
+
+        internal void lerp(float alpha)
+        {
+            this.position = this.position * alpha + this.lastUpdatePosition * (1 - alpha);
+            this.quaternion = Quaternion.Slerp(this.quaternion, this.lastUpdateOrientation, alpha);
+            //state.x = current.x * alpha + previous.x * (1 - alpha);
+            //state.v = current.v * alpha + previous.v * (1 - alpha);
+        }
     }
 }

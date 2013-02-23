@@ -65,7 +65,7 @@ namespace Examples.UTNPhysicsEngine.matias
             this.bodys = new List<Body>();
             this.limitsWorld = new TgcBoundingBox(-WORLD_EXTENTS, WORLD_EXTENTS);
             this.world = new World(this.bodys, WORLD_EXTENTS, 0.05f);
-            this.world.timeSteps = 0.25f;
+            this.world.timeSteps = 0.50f;
 
             //Cargar shader para esferas
             string compilationErrors;
@@ -257,8 +257,8 @@ namespace Examples.UTNPhysicsEngine.matias
             {
                 //Hack rotacion.
                 Vector3 rotacion = Vector3.Normalize(new Vector3(sphereElement.body.velocity.Z, 0, -sphereElement.body.velocity.X));
-                float angulo = (new Vector3(sphereElement.body.position.X,0,sphereElement.body.position.Z) - new Vector3(sphereElement.body.lastUpdatePosition.X,0,sphereElement.body.lastUpdatePosition.Z)).Length() / sphereElement.body.Radius*1.5f;
-                if (rotacion.Length()>float.Epsilon)
+                float angulo = (new Vector3(sphereElement.body.position.X,0,sphereElement.body.position.Z) - new Vector3(sphereElement.body.lastUpdatePosition.X,0,sphereElement.body.lastUpdatePosition.Z)).Length() / sphereElement.body.Radius;
+                if (rotacion.Length() > float.Epsilon && angulo > float.Epsilon)
                     sphereElement.body.lastRotation = sphereElement.body.lastRotation * Matrix.RotationAxis(rotacion, angulo);
                 //Aplicar transformacion al mesh
                 Matrix matWorld = sphereElement.body.getTrasform();

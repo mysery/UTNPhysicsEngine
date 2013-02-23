@@ -27,9 +27,9 @@ namespace Examples.UTNPhysicsEngine.physics
             get { return _spatialHash; }
         }
 
-        private const int MAX_STEPS = 50;
+        private const int MAX_STEPS = 20;
         private const float FIXED_TIME_STEP = 1f / 60f;
-        private float localTime = FIXED_TIME_STEP;
+        private float localTime = 0f;        
         
         public List<Body> bodys;
         private Vector3 worldSize;
@@ -41,6 +41,7 @@ namespace Examples.UTNPhysicsEngine.physics
         public float timeSteps = 1f;
         public bool debugMode = false;
         public bool applyRay = false;
+        public bool fixedWhitLerp = false;
 
         public World(List<Body> bodys, float worldSize, float indexSizeCell = 0.1f, float indexScale = 1f)
         {
@@ -70,7 +71,7 @@ namespace Examples.UTNPhysicsEngine.physics
             this._spatialHash = new SpatialHash(this.worldSize * 2, this.worldSize * indexSizeCell * indexScale, indexScale);
         }
 
-        public World(List<Body> bodys, Vector3 worldSize, float indexSizeCell=0.1f, float indexScale=1f)
+        public World(List<Body> bodys, Vector3 worldSize, float indexSizeCell = 0.1f, float indexScale = 1f, bool fixedWhitLerp=false)
         {
             this.bodys = bodys;
             this.worldSize = worldSize;
@@ -99,6 +100,8 @@ namespace Examples.UTNPhysicsEngine.physics
                                                             this.worldSize.Y/(this.worldSize.Y*indexSizeCell)*2 + 4,
                                                             this.worldSize.Z/(this.worldSize.Z*indexSizeCell)*2 + 4), 
                                                             this.worldSize * indexSizeCell * indexScale, indexScale);
+            this.fixedWhitLerp = fixedWhitLerp;
+
         }
         
         internal void optimize()
@@ -122,25 +125,71 @@ namespace Examples.UTNPhysicsEngine.physics
             this.bodys.Remove(body);
         }
 
+        float dt = 1 / 60f;
+        float acumulador = 0;
         internal void step(float timeStep)
         {
-            int numSimulationSubSteps = 1;
-            localTime += timeStep;
-            float fixedTime = FIXED_TIME_STEP * timeSteps;
-            if (localTime >= fixedTime)
-            {
-                numSimulationSubSteps = (int)(localTime / fixedTime);
-                localTime -= numSimulationSubSteps * fixedTime;
+            if (fixedWhitLerp){
+                float dt = FIXED_TIME_STEP * timeSteps;
+                //Fix encontrado en http://gafferongames.com/game-physics/fix-your-timestep/
+          
+    //            if (timeStep > 0.25f)
+    //                timeStep = 0.25f;	  // note: max frame time to avoid spiral of death
+                acumulador += timeStep;
+                bool cleanState = true;
+                while (acumulador >= dt)
+                {
+                    //float fixedTime = FastMath.Min(timeStep, dt);
+                    this.fixedStep(dt, cleanState);
+                    acumulador -= dt;
+                    cleanState = false;
+                }
+                //this.fixedStep(acumulador);
+                //lerp(acumulador / dt);
             }
-            
-            int clampedSimulationSteps = (numSimulationSubSteps > MAX_STEPS) ? MAX_STEPS : numSimulationSubSteps;
-            for (int i = 0; i < clampedSimulationSteps; i++)
-            {
-                this.integrateForce(fixedTime);
-                this.doCollision();
-                this.doSolveContacts(fixedTime);
-                this.integrateVelocity(fixedTime);
+            else {
+                float fixedTime = FIXED_TIME_STEP * timeSteps;
+                localTime += timeStep;
+                int numSimulationSubSteps = 1;
+
+                if (localTime >= fixedTime)
+                {
+                    numSimulationSubSteps = (int)(localTime / fixedTime);
+                    localTime -= numSimulationSubSteps * fixedTime;
+                }
+
+                int clampedSimulationSteps = (numSimulationSubSteps > MAX_STEPS) ? MAX_STEPS : numSimulationSubSteps;
+                for (int i = 0; i < clampedSimulationSteps; i++)
+                {
+                    this.fixedStep(fixedTime, i==0);
+                }
             }
+        }
+        
+        private void lerp(float alpha)
+        {
+            if (alpha > float.Epsilon)
+            {
+                foreach (Body body in bodys)
+                {
+                    if (body.mass.Equals(0f) || float.IsNaN(body.velocity.X))
+                    {
+                        continue;
+                    }
+
+                    body.lerp(alpha);
+                    //state.x = current.x * alpha + previous.x * (1 - alpha);
+                    //state.v = current.v * alpha + previous.v * (1 - alpha);
+                }
+            }
+        }
+
+        private void fixedStep(float fixedTime, bool cleanState = false)
+        {
+            this.integrateForce(fixedTime);
+            this.doCollision();
+            this.doSolveContacts(fixedTime);
+            this.integrateVelocity(fixedTime, cleanState);
         }
 
         private void integrateForce(float timeStep)
@@ -156,7 +205,7 @@ namespace Examples.UTNPhysicsEngine.physics
             }
         }
 
-        private void integrateVelocity(float timeStep)
+        private void integrateVelocity(float timeStep, bool cleanState)
         {
             foreach (Body body in bodys)
             {
@@ -167,7 +216,7 @@ namespace Examples.UTNPhysicsEngine.physics
                 //Vector3 oldLocation = 
                     
                 SpatialHashAABB oldAabb = body.BoundingBox;
-                body.integrateVelocitySI(timeStep);
+                body.integrateVelocitySI(timeStep, cleanState);
                 body.position = FastMath.clamp(body.position, -worldSize, worldSize);
                 SpatialHashAABB newAabb = body.BoundingBox;
                 _spatialHash.update(oldAabb, newAabb, body);

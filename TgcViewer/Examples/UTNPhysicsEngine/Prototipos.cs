@@ -47,7 +47,7 @@ namespace Examples
 
             Bodys = new List<Body>();
             this.createMesh();
-            this.world = new World(Bodys, WorldSize);
+            this.world = new World(Bodys, WorldSize, 0.1f,1f,false);
             this.limitsWorld = new TgcBoundingBox(  WorldSize*-1f,
                                                     WorldSize);
             

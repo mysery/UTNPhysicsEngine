@@ -50,9 +50,9 @@ namespace Examples.UTNPhysicsEngine.physics.body
             get { return localCenter; }
         }
 
-        public override void integrateVelocitySI(float timeStep)
+        public override void integrateVelocitySI(float timeStep, bool cleanState)
         {
-            base.integrateVelocitySI(timeStep);
+            base.integrateVelocitySI(timeStep, cleanState);
             direction = Matrix.RotationQuaternion(quaternion);
         }
         

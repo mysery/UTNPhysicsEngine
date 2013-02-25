@@ -71,10 +71,13 @@ namespace Examples.UTNPhysicsEngine.physics.body
         { calculateInertiaBody(); initialize = true; } 
             return _InvIbody; } set { _InvIbody = value; } }
 
-        public Matrix getTrasform()
+        public Matrix getTrasform(bool invertY=false, float positionReflect = 0f)
         {
             //this.quaternion.Normalize();
-            return Matrix.Identity * scaling * Matrix.RotationQuaternion(quaternion) * lastRotation * Matrix.Translation(position); //hack last rotation.
+            if (!invertY)
+                return Matrix.Identity * scaling * Matrix.RotationQuaternion(quaternion) * lastRotation * Matrix.Translation(position); //hack last rotation.
+            else
+                return Matrix.Identity * scaling * Matrix.RotationQuaternion(quaternion) * lastRotation * Matrix.Translation(new Vector3(position.X, positionReflect, position.Z)); //hack last rotation.
         }
         
         internal CordinateSystem wordCordSys()

@@ -38,7 +38,8 @@ namespace Examples.UTNPhysicsEngine.matias
         BoxBody tapaMovilBody;
         TgcMeshShader tapaMovilMesh;
         MyFpsCamera camera;
-
+        TgcMeshShader pisoMesh;
+        float reflectPosition = -20f;
 
 
         public override string getCategory()
@@ -151,6 +152,10 @@ namespace Examples.UTNPhysicsEngine.matias
 
                         //Son visibles
                         this.meshesEscenario.Add(m);
+                        if (m.Name == "Plane003")
+                        {
+                            pisoMesh = m;
+                        }
                     }
 
 
@@ -234,51 +239,7 @@ namespace Examples.UTNPhysicsEngine.matias
             }
 
 
-
-
-
-
-            //Cargar variables shader de la luz
-            effectSphere.SetValue("lightColor", ColorValue.FromColor(Color.White));
-            effectSphere.SetValue("lightPosition", TgcParserUtils.vector3ToFloat4Array(lightMesh.Position));
-            effectSphere.SetValue("lightIntensity", 2f);
-            effectSphere.SetValue("lightAttenuation", 0.2f);
-
-            //Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
-            effectSphere.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
-            effectSphere.SetValue("materialAmbientColor", ColorValue.FromColor(Color.White));
-            effectSphere.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.White));
-            effectSphere.SetValue("materialSpecularColor", ColorValue.FromColor(Color.White));
-            effectSphere.SetValue("materialSpecularExp", 20f);
-
-
-            //Render balas
-            foreach (SphereElement sphereElement in this.sphereElements)
-            {
-                //Hack rotacion.
-                Vector3 rotacion = Vector3.Normalize(new Vector3(sphereElement.body.velocity.Z, 0, -sphereElement.body.velocity.X));
-                float angulo = (new Vector3(sphereElement.body.position.X,0,sphereElement.body.position.Z) - new Vector3(sphereElement.body.lastUpdatePosition.X,0,sphereElement.body.lastUpdatePosition.Z)).Length() / sphereElement.body.Radius;
-                if (rotacion.Length() > float.Epsilon && angulo > float.Epsilon)
-                    sphereElement.body.lastRotation = sphereElement.body.lastRotation * Matrix.RotationAxis(rotacion, angulo);
-                //Aplicar transformacion al mesh
-                Matrix matWorld = sphereElement.body.getTrasform();
-                sphereElement.type.mesh.Transform = matWorld;
-                //Render mesh
-                sphereElement.type.mesh.render();
-
-            }
-
-            //Render escenario
-            foreach (TgcMeshShader mesh in this.meshesEscenario)
-            {
-                mesh.render();
-            }
-
-            //Renderizar mesh de luz
-            lightMesh.render();
-
-
-
+            pisoMesh.render();
             //Dibujar/Quitar tapa movil
             bool cajon = (bool)GuiController.Instance.Modifiers["cajon"];
             if (cajon)
@@ -299,6 +260,70 @@ namespace Examples.UTNPhysicsEngine.matias
                 }
             }
 
+
+            //Cargar variables shader de la luz
+            effectSphere.SetValue("lightColor", ColorValue.FromColor(Color.White));
+            effectSphere.SetValue("lightPosition", TgcParserUtils.vector3ToFloat4Array(lightMesh.Position));
+            effectSphere.SetValue("lightIntensity", 2f);
+            effectSphere.SetValue("lightAttenuation", 0.2f);
+
+            //Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
+            effectSphere.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
+            effectSphere.SetValue("materialAmbientColor", ColorValue.FromColor(Color.White));
+            effectSphere.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.White));
+            effectSphere.SetValue("materialSpecularColor", ColorValue.FromColor(Color.White));
+            effectSphere.SetValue("materialSpecularExp", 20f);
+
+
+            //Render con alfablending y sin Zbuffer
+            GuiController.Instance.D3dDevice.RenderState.ZBufferEnable = false;
+            GuiController.Instance.D3dDevice.RenderState.AlphaBlendEnable = true;
+            foreach (SphereElement sphereElement in this.sphereElements)
+            {
+                //Hack rotacion.
+                /*
+                Vector3 rotacion = Vector3.Normalize(new Vector3(sphereElement.body.velocity.Z, 0, -sphereElement.body.velocity.X));
+                float angulo = (new Vector3(sphereElement.body.position.X,0,sphereElement.body.position.Z) - new Vector3(sphereElement.body.lastUpdatePosition.X,0,sphereElement.body.lastUpdatePosition.Z)).Length() / sphereElement.body.Radius;
+                if (rotacion.Length() > float.Epsilon && angulo > float.Epsilon)
+                    sphereElement.body.lastRotation = sphereElement.body.lastRotation * Matrix.RotationAxis(rotacion, angulo);
+                 */
+                //Aplicar transformacion al mesh                
+                Matrix matWorld = sphereElement.body.getTrasform(true, -19.89f);
+                sphereElement.type.mesh.Transform = matWorld;
+                //Render mesh
+                //sphereElement.type.mesh.AlphaBlendEnable = true;
+                sphereElement.type.mesh.render();
+                //sphereElement.type.mesh.AlphaBlendEnable = false;
+            }
+            GuiController.Instance.D3dDevice.RenderState.AlphaBlendEnable = false;
+            GuiController.Instance.D3dDevice.RenderState.ZBufferEnable = true;
+
+            //Render balas
+            foreach (SphereElement sphereElement in this.sphereElements)
+            {
+                //Hack rotacion.
+                Vector3 rotacion = Vector3.Normalize(new Vector3(sphereElement.body.velocity.Z, 0, -sphereElement.body.velocity.X));
+                float angulo = (new Vector3(sphereElement.body.position.X, 0, sphereElement.body.position.Z) - new Vector3(sphereElement.body.lastUpdatePosition.X, 0, sphereElement.body.lastUpdatePosition.Z)).Length() / sphereElement.body.Radius;
+                if (rotacion.Length() > float.Epsilon && angulo > float.Epsilon)
+                    sphereElement.body.lastRotation = sphereElement.body.lastRotation * Matrix.RotationAxis(rotacion, angulo);
+                 
+                //Aplicar transformacion al mesh
+                Matrix matWorld = sphereElement.body.getTrasform();
+                sphereElement.type.mesh.Transform = matWorld;
+                //Render mesh
+                sphereElement.type.mesh.render();
+            }
+
+
+            //Render escenario
+            foreach (TgcMeshShader mesh in this.meshesEscenario)
+            {
+                if (mesh != pisoMesh)
+                    mesh.render();
+            }
+
+            //Renderizar mesh de luz
+            lightMesh.render();
 
             GuiController.Instance.UserVars.setValue(Constant.objectCount, world.bodys.Count);
             GuiController.Instance.UserVars.setValue(Constant.contactCount, world.contacts.Count);

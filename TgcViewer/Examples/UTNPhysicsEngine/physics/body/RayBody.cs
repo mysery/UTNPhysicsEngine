@@ -12,7 +12,7 @@ namespace Examples.UTNPhysicsEngine.physics.body
     public class RayBody : Body
     {
         public RayBody(TgcRay ray)
-            : base(new Vector3(), ray.Direction * 7f, new Vector3(), 0f)
+            : base(new Vector3(), ray.Direction * 10f, new Vector3(), 0f)
         {
         
         }

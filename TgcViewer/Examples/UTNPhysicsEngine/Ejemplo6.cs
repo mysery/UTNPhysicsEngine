@@ -57,8 +57,8 @@ namespace Examples
                                                             new Vector3(),
                                                             y != 0 ? 1.0f : 0f);
                         sphares.restitution = 0.5f;
-                        if (y != 0)
-                            sphares.aceleracion = new Vector3(0.0f, -9.8f, 0.0f);
+                        /*if (y != 0)
+                            sphares.aceleracion = new Vector3(0.0f, -9.8f, 0.0f);*/
 
                         proto.Bodys.Add(sphares);
                     }

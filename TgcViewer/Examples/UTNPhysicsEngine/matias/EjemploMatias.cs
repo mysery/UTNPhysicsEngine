@@ -39,7 +39,7 @@ namespace Examples.UTNPhysicsEngine.matias
         TgcMeshShader tapaMovilMesh;
         MyFpsCamera camera;
         TgcMeshShader pisoMesh;
-        float reflectPosition = -20f;
+        float reflectPosition = -19.85f;
 
 
         public override string getCategory()
@@ -54,7 +54,11 @@ namespace Examples.UTNPhysicsEngine.matias
 
         public override string getDescription()
         {
-            return "El prototipo contiene gran cantidad de modelos prefijados, con las variables para agregar cuerpos definidas segun cada objeto, para la presentacion de UTNPhysicsEngine";
+            return "El prototipo contiene gran cantidad de modelos prefijados, con las variables para agregar cuerpos definidas segun cada objeto, para la presentacion de UTNPhysicsEngine\n"+
+                    "Cancha de basket: 28.65m by 15.24m\n"+
+                    "Basket: 24.257 cm diametro, 650g\n"+
+                    "Tennis: 6.7cm diametro, 60g\n"+
+                    "Futbol: 22cm diametro, 450g";
         }
 
 
@@ -66,7 +70,7 @@ namespace Examples.UTNPhysicsEngine.matias
             this.bodys = new List<Body>();
             this.limitsWorld = new TgcBoundingBox(-WORLD_EXTENTS, WORLD_EXTENTS);
             this.world = new World(this.bodys, WORLD_EXTENTS, 0.05f);
-            this.world.timeSteps = 0.50f;
+            this.world.timeSteps = 0.35f;
 
             //Cargar shader para esferas
             string compilationErrors;
@@ -219,7 +223,7 @@ namespace Examples.UTNPhysicsEngine.matias
 
             //Modifiers
             GuiController.Instance.Modifiers.addInterval("objeto", new string[] { "Basket", "Tenis", "Futbol" }, 0);
-            GuiController.Instance.Modifiers.addInterval("cantidad", new string[] { "1", "2", "3", "4", "5", "10" }, 0);
+            GuiController.Instance.Modifiers.addInterval("cantidad", new string[] { "1", "2", "3", "4", "5"}, 0);
             GuiController.Instance.Modifiers.addBoolean("cajon", "cajon", true);
 
             //Variables.
@@ -260,6 +264,28 @@ namespace Examples.UTNPhysicsEngine.matias
                 }
             }
 
+            //Render con alfablending y sin Zbuffer
+            GuiController.Instance.D3dDevice.RenderState.ZBufferEnable = false;
+            GuiController.Instance.D3dDevice.RenderState.AlphaBlendEnable = true;
+            foreach (SphereElement sphereElement in this.sphereElements)
+            {
+                //Hack rotacion.
+                /*
+                Vector3 rotacion = Vector3.Normalize(new Vector3(sphereElement.body.velocity.Z, 0, -sphereElement.body.velocity.X));
+                float angulo = (new Vector3(sphereElement.body.position.X,0,sphereElement.body.position.Z) - new Vector3(sphereElement.body.lastUpdatePosition.X,0,sphereElement.body.lastUpdatePosition.Z)).Length() / sphereElement.body.Radius;
+                if (rotacion.Length() > float.Epsilon && angulo > float.Epsilon)
+                    sphereElement.body.lastRotation = sphereElement.body.lastRotation * Matrix.RotationAxis(rotacion, angulo);
+                 */
+                //Aplicar transformacion al mesh                
+                Matrix matWorld = sphereElement.body.getTrasform(true, reflectPosition);
+                sphereElement.type.mesh.Transform = matWorld;                
+                //Render mesh
+                //sphereElement.type.mesh.AlphaBlendEnable = true;
+                sphereElement.type.mesh.render();
+                //sphereElement.type.mesh.AlphaBlendEnable = false;
+            }
+            GuiController.Instance.D3dDevice.RenderState.AlphaBlendEnable = false;
+            GuiController.Instance.D3dDevice.RenderState.ZBufferEnable = true;
 
             //Cargar variables shader de la luz
             effectSphere.SetValue("lightColor", ColorValue.FromColor(Color.White));
@@ -274,30 +300,6 @@ namespace Examples.UTNPhysicsEngine.matias
             effectSphere.SetValue("materialSpecularColor", ColorValue.FromColor(Color.White));
             effectSphere.SetValue("materialSpecularExp", 20f);
 
-
-            //Render con alfablending y sin Zbuffer
-            GuiController.Instance.D3dDevice.RenderState.ZBufferEnable = false;
-            GuiController.Instance.D3dDevice.RenderState.AlphaBlendEnable = true;
-            foreach (SphereElement sphereElement in this.sphereElements)
-            {
-                //Hack rotacion.
-                /*
-                Vector3 rotacion = Vector3.Normalize(new Vector3(sphereElement.body.velocity.Z, 0, -sphereElement.body.velocity.X));
-                float angulo = (new Vector3(sphereElement.body.position.X,0,sphereElement.body.position.Z) - new Vector3(sphereElement.body.lastUpdatePosition.X,0,sphereElement.body.lastUpdatePosition.Z)).Length() / sphereElement.body.Radius;
-                if (rotacion.Length() > float.Epsilon && angulo > float.Epsilon)
-                    sphereElement.body.lastRotation = sphereElement.body.lastRotation * Matrix.RotationAxis(rotacion, angulo);
-                 */
-                //Aplicar transformacion al mesh                
-                Matrix matWorld = sphereElement.body.getTrasform(true, -19.89f);
-                sphereElement.type.mesh.Transform = matWorld;
-                //Render mesh
-                //sphereElement.type.mesh.AlphaBlendEnable = true;
-                sphereElement.type.mesh.render();
-                //sphereElement.type.mesh.AlphaBlendEnable = false;
-            }
-            GuiController.Instance.D3dDevice.RenderState.AlphaBlendEnable = false;
-            GuiController.Instance.D3dDevice.RenderState.ZBufferEnable = true;
-
             //Render balas
             foreach (SphereElement sphereElement in this.sphereElements)
             {
@@ -306,6 +308,8 @@ namespace Examples.UTNPhysicsEngine.matias
                 float angulo = (new Vector3(sphereElement.body.position.X, 0, sphereElement.body.position.Z) - new Vector3(sphereElement.body.lastUpdatePosition.X, 0, sphereElement.body.lastUpdatePosition.Z)).Length() / sphereElement.body.Radius;
                 if (rotacion.Length() > float.Epsilon && angulo > float.Epsilon)
                     sphereElement.body.lastRotation = sphereElement.body.lastRotation * Matrix.RotationAxis(rotacion, angulo);
+                else
+                    sphereElement.body.lastRotation = Matrix.Identity;
                  
                 //Aplicar transformacion al mesh
                 Matrix matWorld = sphereElement.body.getTrasform();
@@ -355,9 +359,15 @@ namespace Examples.UTNPhysicsEngine.matias
                 SphereElement sphereElement = new SphereElement();
                 sphereElement.type = sphereType;
 
+                Vector3 direccionTiro = cameraLookAt - cameraPos;
                 //Parametros de esfera
-                Vector3 position = cameraPos + new Vector3(i * sphereElement.type.radius * 2f, i * sphereElement.type.radius * 2f, 0);
-                Vector3 velocity = Vector3.Normalize(cameraLookAt - cameraPos) * 10;
+                float initialX = cameraPos.X - (cantidad - 1) * sphereElement.type.radius;
+                float initialZ = cameraPos.Z - (cantidad - 1) * sphereElement.type.radius;
+                Vector3 position = new Vector3(initialX + i * sphereElement.type.radius * 2,
+                                        cameraPos.Y,
+                                        initialZ + i * sphereElement.type.radius * 2);
+                //Vector3 position = cameraPos + new Vector3(i * sphereElement.type.radius * 2f, i * sphereElement.type.radius * 2f, 0);
+                Vector3 velocity = Vector3.Normalize(direccionTiro) * 10;
                 Vector3 acceleration = new Vector3();// por default es la gravedad. (0.0f, -9.8f, 0.0f)*masa;
 
                 //Crear cuerpo de esfera
@@ -371,6 +381,19 @@ namespace Examples.UTNPhysicsEngine.matias
                 //Agregar a lista de elementos
                 this.sphereElements.Add(sphereElement);
             }
+
+            if (this.bodys.Count > 200)
+            {
+                for (int i = 0; i < cantidad; i++)
+                {
+                    //Agregar al world
+                    SphereElement sphereElement = this.sphereElements[0];
+                    this.world.removeBody(sphereElement.body);
+                    this.bodys.Remove(sphereElement.body);
+                    this.sphereElements.Remove(sphereElement);
+                }
+            }
+
         }
 
         public override void close()

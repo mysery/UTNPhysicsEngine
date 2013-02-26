@@ -159,6 +159,17 @@ technique DIFFUSE_MAP
 {
    pass Pass_0
    {
+	  ZEnable = true;
+	  VertexShader = compile vs_2_0 vs_DiffuseMap();
+	  PixelShader = compile ps_2_0 ps_DiffuseMap();
+   }
+}
+
+technique Z_DIFFUSE_MAP
+{
+   pass Pass_0
+   {
+	  ZEnable = false;
 	  VertexShader = compile vs_2_0 vs_DiffuseMap();
 	  PixelShader = compile ps_2_0 ps_DiffuseMap();
    }

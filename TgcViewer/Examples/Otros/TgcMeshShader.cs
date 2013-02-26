@@ -75,13 +75,15 @@ namespace Examples.Shaders
 
             //Aplicar transformacion de malla
             updateMeshTransform();
+            
 
             //Cargar VertexDeclaration
             device.VertexDeclaration = vertexDeclaration;
 
             //Activar AlphaBlending
             activateAlphaBlend();
-
+            desactiveZbuffer();
+            
             //Cargar valores de shader de matrices que dependen de la posición del mesh
             setShaderMatrix(this.effect, this.transform);
 
@@ -174,6 +176,7 @@ namespace Examples.Shaders
 
             //Activar AlphaBlending
             resetAlphaBlend();
+            resetZBuffer();
 
         }
 

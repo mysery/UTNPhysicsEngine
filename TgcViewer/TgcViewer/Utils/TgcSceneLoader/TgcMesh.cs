@@ -258,7 +258,7 @@ namespace TgcViewer.Utils.TgcSceneLoader
         {
             get { return d3dMesh.NumberVertices; }
         }
-
+        protected bool zbufferDisable;
         protected bool alphaBlendEnable;
         /// <summary>
         /// Habilita el renderizado con AlphaBlending para los modelos
@@ -270,6 +270,13 @@ namespace TgcViewer.Utils.TgcSceneLoader
             get { return alphaBlendEnable; }
             set { alphaBlendEnable = value; }
         }
+
+        public bool ZbufferDisable
+        {
+            get { return zbufferDisable; }
+            set { zbufferDisable = value; }
+        }
+        
 
         /// <summary>
         /// Constructor vacio, para facilitar la herencia de esta clase.
@@ -359,7 +366,7 @@ namespace TgcViewer.Utils.TgcSceneLoader
 
             //Activar AlphaBlending si corresponde
             activateAlphaBlend();
-            
+            desactiveZbuffer();
 
             //Renderizar segun el tipo de render de la malla
             switch (renderType)
@@ -415,6 +422,7 @@ namespace TgcViewer.Utils.TgcSceneLoader
 
             //Desactivar alphaBlend
             resetAlphaBlend();
+            resetZBuffer();
         }
 
         /// <summary>
@@ -454,6 +462,23 @@ namespace TgcViewer.Utils.TgcSceneLoader
             Device device = GuiController.Instance.D3dDevice;
             device.RenderState.AlphaTestEnable = false;
             device.RenderState.AlphaBlendEnable = false;
+        }
+
+        protected void desactiveZbuffer()
+        {
+            Device device = GuiController.Instance.D3dDevice;
+            if (zbufferDisable)
+            {
+                device.RenderState.ZBufferEnable = false;
+                device.RenderState.ZBufferWriteEnable = false;
+            }
+        }
+
+        protected void resetZBuffer()
+        {
+            Device device = GuiController.Instance.D3dDevice;
+            device.RenderState.ZBufferEnable = true;
+            device.RenderState.ZBufferWriteEnable = true;
         }
 
         /// <summary>

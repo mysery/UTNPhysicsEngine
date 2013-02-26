@@ -39,7 +39,7 @@ namespace Examples.UTNPhysicsEngine.matias
         TgcMeshShader tapaMovilMesh;
         MyFpsCamera camera;
         TgcMeshShader pisoMesh;
-        float reflectPosition = -19.85f;
+        float reflectPosition = -20f;
 
 
         public override string getCategory()
@@ -54,10 +54,10 @@ namespace Examples.UTNPhysicsEngine.matias
 
         public override string getDescription()
         {
-            return "El prototipo contiene gran cantidad de modelos prefijados, con las variables para agregar cuerpos definidas segun cada objeto, para la presentacion de UTNPhysicsEngine\n"+
-                    "Cancha de basket: 28.65m by 15.24m\n"+
-                    "Basket: 24.257 cm diametro, 650g\n"+
-                    "Tennis: 6.7cm diametro, 60g\n"+
+            return "El prototipo contiene gran cantidad de modelos prefijados, con las variables para agregar cuerpos definidas segun cada objeto, para la presentacion de UTNPhysicsEngine         "+
+                    "Cancha de basket: 28.65m by 15.24m     "+
+                    "Basket: 24.257 cm diametro, 650g       "+
+                    "Tennis: 6.7cm diametro, 60g            "+
                     "Futbol: 22cm diametro, 450g";
         }
 
@@ -242,10 +242,49 @@ namespace Examples.UTNPhysicsEngine.matias
                 dispararPelota();
             }
 
-
+            GuiController.Instance.D3dDevice.Clear(ClearFlags.Stencil, 0, 1f, 0);
+            GuiController.Instance.D3dDevice.RenderState.StencilPass = StencilOperation.Replace;
+            GuiController.Instance.D3dDevice.RenderState.StencilFunction = Compare.Always;
+            GuiController.Instance.D3dDevice.RenderState.StencilEnable = true;
+            GuiController.Instance.D3dDevice.RenderState.ReferenceStencil = 1;
             pisoMesh.render();
-            //Dibujar/Quitar tapa movil
+
+            GuiController.Instance.D3dDevice.RenderState.StencilPass = StencilOperation.Keep;
+            GuiController.Instance.D3dDevice.RenderState.StencilFunction = Compare.Equal;
+
             bool cajon = (bool)GuiController.Instance.Modifiers["cajon"];
+            if (cajon)
+            {
+                //-15.1378f ... -10f -19.71213 -39.58f
+                tapaMovilMesh.Position = new Vector3(0f, -9.4f, 0f);
+                tapaMovilMesh.AlphaBlendEnable = true;
+                tapaMovilMesh.ZbufferDisable = true;
+                tapaMovilMesh.Effect.Technique = "Z_DIFFUSE_MAP";
+                tapaMovilMesh.render();
+                tapaMovilMesh.AlphaBlendEnable = false;
+                tapaMovilMesh.ZbufferDisable = false;
+            }
+
+            foreach (SphereElement sphereElement in this.sphereElements)
+            {
+                //Aplicar transformacion al mesh                
+                Matrix matWorld = sphereElement.body.getTrasform(true, -39.58f);
+                sphereElement.type.mesh.Transform = matWorld;
+                //Render mesh
+                sphereElement.type.mesh.AlphaBlendEnable = true;
+                sphereElement.type.mesh.ZbufferDisable = true;
+                sphereElement.type.mesh.Effect.Technique = "Z_DIFFUSE_MAP";
+                GuiController.Instance.D3dDevice.RenderState.CullMode = Cull.Clockwise;
+                sphereElement.type.mesh.render();
+                GuiController.Instance.D3dDevice.RenderState.CullMode = Cull.None;
+                sphereElement.type.mesh.AlphaBlendEnable = false;
+                sphereElement.type.mesh.ZbufferDisable = false;
+            }
+            
+            GuiController.Instance.D3dDevice.RenderState.StencilEnable = false;
+
+            //Dibujar/Quitar tapa movil
+            //bool cajon = (bool)GuiController.Instance.Modifiers["cajon"];
             if (cajon)
             {
                 if (!tapaMovilMesh.Enabled)
@@ -253,6 +292,8 @@ namespace Examples.UTNPhysicsEngine.matias
                     tapaMovilMesh.Enabled = true;
                     world.addBody(tapaMovilBody);
                 }
+                tapaMovilMesh.Position = new Vector3();
+                tapaMovilMesh.Effect.Technique = "DIFFUSE_MAP";
                 tapaMovilMesh.render();
             }
             else
@@ -264,30 +305,7 @@ namespace Examples.UTNPhysicsEngine.matias
                 }
             }
 
-            //Render con alfablending y sin Zbuffer
-            GuiController.Instance.D3dDevice.RenderState.ZBufferEnable = false;
-            GuiController.Instance.D3dDevice.RenderState.AlphaBlendEnable = true;
-            foreach (SphereElement sphereElement in this.sphereElements)
-            {
-                //Hack rotacion.
-                /*
-                Vector3 rotacion = Vector3.Normalize(new Vector3(sphereElement.body.velocity.Z, 0, -sphereElement.body.velocity.X));
-                float angulo = (new Vector3(sphereElement.body.position.X,0,sphereElement.body.position.Z) - new Vector3(sphereElement.body.lastUpdatePosition.X,0,sphereElement.body.lastUpdatePosition.Z)).Length() / sphereElement.body.Radius;
-                if (rotacion.Length() > float.Epsilon && angulo > float.Epsilon)
-                    sphereElement.body.lastRotation = sphereElement.body.lastRotation * Matrix.RotationAxis(rotacion, angulo);
-                 */
-                //Aplicar transformacion al mesh                
-                Matrix matWorld = sphereElement.body.getTrasform(true, reflectPosition);
-                sphereElement.type.mesh.Transform = matWorld;                
-                //Render mesh
-                //sphereElement.type.mesh.AlphaBlendEnable = true;
-                sphereElement.type.mesh.render();
-                //sphereElement.type.mesh.AlphaBlendEnable = false;
-            }
-            GuiController.Instance.D3dDevice.RenderState.AlphaBlendEnable = false;
-            GuiController.Instance.D3dDevice.RenderState.ZBufferEnable = true;
-
-            //Cargar variables shader de la luz
+            ////Cargar variables shader de la luz
             effectSphere.SetValue("lightColor", ColorValue.FromColor(Color.White));
             effectSphere.SetValue("lightPosition", TgcParserUtils.vector3ToFloat4Array(lightMesh.Position));
             effectSphere.SetValue("lightIntensity", 2f);
@@ -296,7 +314,7 @@ namespace Examples.UTNPhysicsEngine.matias
             //Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
             effectSphere.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
             effectSphere.SetValue("materialAmbientColor", ColorValue.FromColor(Color.White));
-            effectSphere.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.White));
+            effectSphere.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.FromArgb(128, Color.White)));
             effectSphere.SetValue("materialSpecularColor", ColorValue.FromColor(Color.White));
             effectSphere.SetValue("materialSpecularExp", 20f);
 
@@ -310,11 +328,12 @@ namespace Examples.UTNPhysicsEngine.matias
                     sphereElement.body.lastRotation = sphereElement.body.lastRotation * Matrix.RotationAxis(rotacion, angulo);
                 else
                     sphereElement.body.lastRotation = Matrix.Identity;
-                 
+
                 //Aplicar transformacion al mesh
                 Matrix matWorld = sphereElement.body.getTrasform();
                 sphereElement.type.mesh.Transform = matWorld;
                 //Render mesh
+                sphereElement.type.mesh.Effect.Technique = "DIFFUSE_MAP";
                 sphereElement.type.mesh.render();
             }
 
@@ -331,6 +350,16 @@ namespace Examples.UTNPhysicsEngine.matias
 
             GuiController.Instance.UserVars.setValue(Constant.objectCount, world.bodys.Count);
             GuiController.Instance.UserVars.setValue(Constant.contactCount, world.contacts.Count);
+
+            //Render con alfablending y sin Zbuffer
+            //GuiController.Instance.D3dDevice.RenderState.ZBufferEnable = false;
+            //GuiController.Instance.D3dDevice.RenderState.AlphaBlendEnable = false;
+           
+            //GuiController.Instance.D3dDevice.RenderState.AlphaBlendEnable = true;
+            //GuiController.Instance.D3dDevice.RenderState.ZBufferEnable = true;
+
+            
+
             //Dibujar limites del escenario
             //limitsWorld.render();
 

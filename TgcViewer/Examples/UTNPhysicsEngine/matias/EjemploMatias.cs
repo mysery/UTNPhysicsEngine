@@ -291,7 +291,7 @@ namespace Examples.UTNPhysicsEngine.matias
 
             GuiController.Instance.D3dDevice.RenderState.ZBufferWriteEnable = true;
             ColorWriteEnable col = GuiController.Instance.D3dDevice.RenderState.ColorWriteEnable;
-            //GuiController.Instance.D3dDevice.RenderState.ColorWriteEnable = 0;
+            GuiController.Instance.D3dDevice.RenderState.ColorWriteEnable = 0;
             pisoMesh.render();
             GuiController.Instance.D3dDevice.RenderState.ColorWriteEnable = col;
             

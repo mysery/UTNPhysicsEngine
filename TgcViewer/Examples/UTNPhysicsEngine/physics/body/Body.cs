@@ -77,7 +77,7 @@ namespace Examples.UTNPhysicsEngine.physics.body
             if (!invertY)
                 return Matrix.Identity * scaling * Matrix.RotationQuaternion(quaternion) * lastRotation * Matrix.Translation(position); //hack last rotation.
             else
-                return Matrix.Identity * scaling * Matrix.Scaling(1f,-1f,1f) * Matrix.RotationQuaternion(quaternion) * lastRotation * Matrix.Translation(new Vector3(position.X, positionReflect - position.Y, position.Z)); //hack last rotation.
+                return Matrix.Identity * scaling * Matrix.RotationQuaternion(quaternion) * lastRotation * Matrix.Translation(new Vector3(position.X, positionReflect - position.Y, position.Z)); //hack last rotation.
         }
         
         internal CordinateSystem wordCordSys()

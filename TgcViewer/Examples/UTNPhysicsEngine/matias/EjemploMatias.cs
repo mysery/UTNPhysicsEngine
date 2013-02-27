@@ -247,6 +247,7 @@ namespace Examples.UTNPhysicsEngine.matias
             GuiController.Instance.D3dDevice.RenderState.StencilFunction = Compare.Always;
             GuiController.Instance.D3dDevice.RenderState.StencilEnable = true;
             GuiController.Instance.D3dDevice.RenderState.ReferenceStencil = 1;
+            GuiController.Instance.D3dDevice.RenderState.ZBufferWriteEnable = false;
             pisoMesh.render();
 
             GuiController.Instance.D3dDevice.RenderState.StencilPass = StencilOperation.Keep;
@@ -255,33 +256,45 @@ namespace Examples.UTNPhysicsEngine.matias
             bool cajon = (bool)GuiController.Instance.Modifiers["cajon"];
             if (cajon)
             {
+                GuiController.Instance.D3dDevice.RenderState.ZBufferWriteEnable = true;
                 //-15.1378f ... -10f -19.71213 -39.58f
-                tapaMovilMesh.Position = new Vector3(0f, -9.4f, 0f);
+                tapaMovilMesh.Position = new Vector3(0f, -9.2f, 0f);
                 tapaMovilMesh.AlphaBlendEnable = true;
-                tapaMovilMesh.ZbufferDisable = true;
-                tapaMovilMesh.Effect.Technique = "Z_DIFFUSE_MAP";
+                tapaMovilMesh.ZbufferDisable = false;
+                tapaMovilMesh.Effect.Technique = "DIFFUSE_MAP";
                 tapaMovilMesh.render();
                 tapaMovilMesh.AlphaBlendEnable = false;
                 tapaMovilMesh.ZbufferDisable = false;
             }
-
+            
             foreach (SphereElement sphereElement in this.sphereElements)
             {
                 //Aplicar transformacion al mesh                
                 Matrix matWorld = sphereElement.body.getTrasform(true, -39.58f);
                 sphereElement.type.mesh.Transform = matWorld;
+                //matWorld.M22 = -matWorld.M22; no hace falta ya que se tiene el Cull.CounterClockwise da el efecto de rotacion.
+                
                 //Render mesh
                 sphereElement.type.mesh.AlphaBlendEnable = true;
-                sphereElement.type.mesh.ZbufferDisable = true;
-                sphereElement.type.mesh.Effect.Technique = "Z_DIFFUSE_MAP";
-                GuiController.Instance.D3dDevice.RenderState.CullMode = Cull.Clockwise;
+                sphereElement.type.mesh.ZbufferDisable = false;
+                sphereElement.type.mesh.Effect.Technique = "DIFFUSE_MAP";
+                GuiController.Instance.D3dDevice.RenderState.CullMode = Cull.CounterClockwise;
                 sphereElement.type.mesh.render();
                 GuiController.Instance.D3dDevice.RenderState.CullMode = Cull.None;
                 sphereElement.type.mesh.AlphaBlendEnable = false;
                 sphereElement.type.mesh.ZbufferDisable = false;
             }
             
+            GuiController.Instance.D3dDevice.Clear(ClearFlags.ZBuffer, 0, 1f, 0);
+            
             GuiController.Instance.D3dDevice.RenderState.StencilEnable = false;
+
+            GuiController.Instance.D3dDevice.RenderState.ZBufferWriteEnable = true;
+            ColorWriteEnable col = GuiController.Instance.D3dDevice.RenderState.ColorWriteEnable;
+            //GuiController.Instance.D3dDevice.RenderState.ColorWriteEnable = 0;
+            pisoMesh.render();
+            GuiController.Instance.D3dDevice.RenderState.ColorWriteEnable = col;
+            
 
             //Dibujar/Quitar tapa movil
             //bool cajon = (bool)GuiController.Instance.Modifiers["cajon"];
@@ -314,7 +327,7 @@ namespace Examples.UTNPhysicsEngine.matias
             //Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
             effectSphere.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
             effectSphere.SetValue("materialAmbientColor", ColorValue.FromColor(Color.White));
-            effectSphere.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.FromArgb(128, Color.White)));
+            effectSphere.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.FromArgb(110, Color.White)));
             effectSphere.SetValue("materialSpecularColor", ColorValue.FromColor(Color.White));
             effectSphere.SetValue("materialSpecularExp", 20f);
 
@@ -395,6 +408,7 @@ namespace Examples.UTNPhysicsEngine.matias
                 Vector3 position = new Vector3(initialX + i * sphereElement.type.radius * 2,
                                         cameraPos.Y,
                                         initialZ + i * sphereElement.type.radius * 2);
+                position = FastMath.clamp(position, -WORLD_EXTENTS, WORLD_EXTENTS);
                 //Vector3 position = cameraPos + new Vector3(i * sphereElement.type.radius * 2f, i * sphereElement.type.radius * 2f, 0);
                 Vector3 velocity = Vector3.Normalize(direccionTiro) * 10;
                 Vector3 acceleration = new Vector3();// por default es la gravedad. (0.0f, -9.8f, 0.0f)*masa;

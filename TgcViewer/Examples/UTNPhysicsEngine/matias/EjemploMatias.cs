@@ -39,9 +39,7 @@ namespace Examples.UTNPhysicsEngine.matias
         TgcMeshShader tapaMovilMesh;
         MyFpsCamera camera;
         TgcMeshShader pisoMesh;
-        float reflectPosition = -20f;
-
-
+        
         public override string getCategory()
         {
             return "Prototipo presentación";
@@ -54,11 +52,11 @@ namespace Examples.UTNPhysicsEngine.matias
 
         public override string getDescription()
         {
-            return "El prototipo contiene gran cantidad de modelos prefijados, con las variables para agregar cuerpos definidas segun cada objeto, para la presentacion de UTNPhysicsEngine         "+
-                    "Cancha de basket: 28.65m by 15.24m     "+
-                    "Basket: 24.257 cm diametro, 650g       "+
-                    "Tennis: 6.7cm diametro, 60g            "+
-                    "Futbol: 22cm diametro, 450g";
+            return "El prototipo contiene gran cantidad de modelos prefijados, con las variables para agregar cuerpos definidas segun cada objeto, para la presentacion de UTNPhysicsEngine                 "+
+                    "Cancha de basket: 28.65m por 15.24m.                                   "+
+                    "Pelota de Basket: 24.257 cm diametro, 650g.                              " +
+                    "Pelota de Tennis: 6.7cm diametro, 60g.                                        " +
+                    "Pelota de Futbol: 22cm diametro, 450g.                                 ";
         }
 
 

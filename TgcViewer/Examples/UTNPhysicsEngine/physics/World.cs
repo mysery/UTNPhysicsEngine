@@ -10,6 +10,7 @@ using TgcViewer;
 using Examples.UTNPhysicsEngine.physics.body;
 using Examples.UTNPhysicsEngine.optimizacion.octree;
 using Examples.UTNPhysicsEngine.optimizacion.spatialHash;
+using System.Threading.Tasks;
 
 namespace Examples.UTNPhysicsEngine.physics
 {
@@ -34,7 +35,7 @@ namespace Examples.UTNPhysicsEngine.physics
         public List<Body> bodys;
         private Vector3 worldSize;
         //private ISet<Contact> contacts = new HashSet<Contact>(new ContactComparer());
-        public ArrayList contacts = new ArrayList();//<Contact>();//new ContactComparer());
+        public List<Contact> contacts = new List<Contact>();//<Contact>();//new ContactComparer());
         private PlaneBody[] planesLimits = new PlaneBody[6];
         private TgcPickingRay pickingRay;
 
@@ -128,7 +129,6 @@ namespace Examples.UTNPhysicsEngine.physics
             this.bodys.Remove(body);
         }
 
-        float dt = 1 / 60f;
         float acumulador = 0;
         internal void step(float timeStep)
         {
@@ -197,46 +197,38 @@ namespace Examples.UTNPhysicsEngine.physics
 
         private void integrateForce(float timeStep)
         {
-            foreach (Body body in bodys)
+            //foreach (Body body in bodys)
+            Parallel.ForEach(bodys, body =>
             {
-                if (body.mass.Equals(0f) || float.IsNaN(body.velocity.X))
+                if (!body.mass.Equals(0f) && !float.IsNaN(body.velocity.X))
                 {
-                    continue;
+                    body.integrateForceSI(timeStep);
                 }
-                
-                body.integrateForceSI(timeStep);                
+
             }
+            );
         }
 
         private void integrateVelocity(float timeStep, bool cleanState)
         {
-            foreach (Body body in bodys)
+            object resultsLock = new object(); // globally visible
+            //foreach (Body body in bodys)
+            Parallel.ForEach(bodys, body =>
             {
-                if (body.mass.Equals(0f) || float.IsNaN(body.velocity.X))
+                if (!body.mass.Equals(0f) && !float.IsNaN(body.velocity.X))
                 {
-                    continue;
+                    SpatialHashAABB oldAabb = body.BoundingBox;
+                    body.integrateVelocitySI(timeStep, cleanState);
+                    body.position = FastMath.clamp(body.position, -worldSize, worldSize);
+                    SpatialHashAABB newAabb = body.BoundingBox;
+                    lock (resultsLock)
+                    {
+                        _spatialHash.update(oldAabb, newAabb, body);
+                    }
                 }
-                //Vector3 oldLocation = 
-                    
-                SpatialHashAABB oldAabb = body.BoundingBox;
-                body.integrateVelocitySI(timeStep, cleanState);
-                body.position = FastMath.clamp(body.position, -worldSize, worldSize);
-                SpatialHashAABB newAabb = body.BoundingBox;
-                _spatialHash.update(oldAabb, newAabb, body);
-                //_spatialHash.add(newAabb.aabbMin, newAabb.aabbMax, body);
 
-                /*if ((body.LastUpdatePosition - body.position).LengthSq() > updatePostionDistance)
-                {
-                    _octree.RemoveHashNode(body.LastUpdatePosition, body);
-                    _octree.AddNode(body.position, body, body.BoundingBox);
-                    body.LastUpdatePosition = body.position;
-                    if (!_octree.RemoveHashNode(body.LastUpdatePosition, body))
-                        Logger.logInThread("No se puede borrar", Color.DarkRed);
-                    if (!_octree.AddNode(body.position, body, body.BoundingBox))
-                        Logger.logInThread("No se pudo agregar", Color.DarkRed);
-                    
-                }*/
             }
+            );
         }
 
         private void doCollision()
@@ -250,20 +242,21 @@ namespace Examples.UTNPhysicsEngine.physics
                 pickingRay.updateRay();
                 picking = true;
             }
-
-            foreach (Body bodyPivot in bodys)
+            object resultsLock = new object(); // globally visible
+            //foreach (Body bodyPivot in bodys)
+            Parallel.ForEach(bodys, bodyPivot =>
             {
-                if (bodyPivot.mass.Equals(0f) || float.IsNaN(bodyPivot.velocity.X))
+                if (!bodyPivot.mass.Equals(0f) && !float.IsNaN(bodyPivot.velocity.X))
                 {
-                    continue;
-                }
-
                 List<Contact> contactWorld = ContactBuilder.TestCollisionWorld(bodyPivot,
                                                                      planesLimits);
 
                 //las coliciones con el mundo deben ser resultas tambien.
-                //if (contactWorld != null)
-                    contacts.AddRange(contactWorld);
+                if (contactWorld != null)
+                    lock (resultsLock)
+                    {
+                        contacts.AddRange(contactWorld);
+                    }
                 SpatialHashAABB aabb = bodyPivot.BoundingBox;
                 ArrayList nearList = _spatialHash.getNeighbors(aabb.aabbMin, aabb.aabbMax);
                 foreach (Body bodyNear in nearList)
@@ -280,11 +273,12 @@ namespace Examples.UTNPhysicsEngine.physics
 
                     //contact == null No hay colision.
                     if (contact != null)
-                        contacts.AddRange(contact);
-                        //if (!contacts.Add(contact))
-                        // Logger.logInThread("El contacto esta repetido.", Color.DarkGoldenrod);
+                        lock (resultsLock)
+                        {
+                            contacts.AddRange(contact);
+                        }
                 }
-
+                    
                 if (picking)
                 {
                     if (applyRay)
@@ -292,17 +286,23 @@ namespace Examples.UTNPhysicsEngine.physics
                         List<Contact> contactPick = ContactBuilder.TestCollisionPick(bodyPivot,
                                                                                     pickingRay.Ray);
                         if (contactPick != null)
-                            contacts.AddRange(contactPick);
+                            lock (resultsLock)
+                            {
+                                contacts.AddRange(contactPick);
+                            }
                     }
                 }
+                }
             }
+            );
             picking = false;
         }
 
         private void doSolveContacts(float timeStep)
         {
             foreach (Contact c in contacts)
-			{
+            //Parallel.ForEach(contacts, c => No se puede paralelizar sin agregar potencias de velocidad.
+            {
                 if (debugMode)
                 {
                     debugContacts.Add(c);
@@ -313,7 +313,7 @@ namespace Examples.UTNPhysicsEngine.physics
                 }
 
                 ContactSolver.solveSimpleContact(c, timeStep);
-			}
+            }
         }
 
         public ArrayList debugContacts = new ArrayList(2000);

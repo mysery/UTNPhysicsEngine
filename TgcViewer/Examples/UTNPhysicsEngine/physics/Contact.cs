@@ -7,7 +7,7 @@ using Examples.UTNPhysicsEngine.physics.body;
 
 namespace Examples.UTNPhysicsEngine.physics
 {
-    class Contact
+    public class Contact
     {
         private const float MAX_FRICTION_SUPORTED = 10f;
         public Body bodyA;

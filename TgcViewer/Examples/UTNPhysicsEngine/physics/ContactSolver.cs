@@ -52,8 +52,6 @@ namespace Examples.UTNPhysicsEngine.physics
             {
                 c.bodyB.ApplyImpulse(relPosB, c.normalContact, -fixedImpulse);
             }
-
-            
         }
 
         //DEPRECADO, no lo uso porque trae errores.

@@ -40,6 +40,8 @@ namespace Examples.UTNPhysicsEngine.matias
         TgcMeshShader tapaMovilMesh;
         MyFpsCamera camera;
         TgcMeshShader pisoMesh;
+        List<TgcMeshShader> reflectedMesh = new List<TgcMeshShader>();
+        
         
         public override string getCategory()
         {
@@ -159,6 +161,24 @@ namespace Examples.UTNPhysicsEngine.matias
                         {
                             pisoMesh = m;
                         }
+                        if (m.Name == "Box039" || 
+                            m.Name == "Box040" || 
+                            m.Name == "Box041" || 
+                            m.Name == "Box043" || 
+                            m.Name == "Box042" || 
+                            m.Name == "Box043" || 
+                            m.Name == "Box044" || 
+                            m.Name == "Box045" || 
+                            m.Name == "Box046" ||
+                            m.Name == "Box006" ||
+                            m.Name == "Box011" ||
+                            m.Name == "Box012" ||
+                            m.Name == "Box016" ||
+                            m.Name == "Box017" ||
+                            m.Name == "Box018")
+                        {
+                            reflectedMesh.Add(m);
+                        }                        
                     }
 
 
@@ -198,6 +218,11 @@ namespace Examples.UTNPhysicsEngine.matias
                 {
                     //Son visibles
                     this.meshesEscenario.Add(m);
+                    if (m.Name == "Torus001" ||
+                       m.Name == "Torus003")
+                    {
+                        reflectedMesh.Add(m);
+                    }  
                 }
 
             }
@@ -271,7 +296,22 @@ namespace Examples.UTNPhysicsEngine.matias
                 tapaMovilMesh.AlphaBlendEnable = false;
                 tapaMovilMesh.ZbufferDisable = false;
             }
-            
+
+            foreach (TgcMeshShader reflected in reflectedMesh)
+            {
+                GuiController.Instance.D3dDevice.RenderState.ZBufferWriteEnable = true;
+                reflected.Position = new Vector3(0f, -39.58f, 0f); //-12.8f //-13.0f
+                reflected.Rotation = new Vector3(0f, 0f, FastMath.PI);
+                reflected.AlphaBlendEnable = true;
+                reflected.ZbufferDisable = false;
+                reflected.Effect.Technique = "DIFFUSE_MAP";
+                GuiController.Instance.D3dDevice.RenderState.CullMode = Cull.Clockwise;
+                reflected.render();
+                GuiController.Instance.D3dDevice.RenderState.CullMode = Cull.None;
+                reflected.AlphaBlendEnable = false;
+                reflected.ZbufferDisable = false;
+            }
+
             foreach (SphereElement sphereElement in this.sphereElements)
             {
                 //Aplicar transformacion al mesh                
@@ -318,6 +358,14 @@ namespace Examples.UTNPhysicsEngine.matias
                     tapaMovilMesh.Enabled = false;
                     world.removeBody(tapaMovilBody);
                 }
+            }
+
+            foreach (TgcMeshShader reflected in reflectedMesh)
+            {
+                reflected.Position = Vector3.Empty;
+                reflected.Rotation = Vector3.Empty;
+                reflected.Effect.Technique = "DIFFUSE_MAP";
+                reflected.render();
             }
 
             ////Cargar variables shader de la luz
@@ -376,8 +424,9 @@ namespace Examples.UTNPhysicsEngine.matias
             //Render escenario
             foreach (TgcMeshShader mesh in this.meshesEscenario)
             {
-                if (mesh != pisoMesh)
+                if (mesh != pisoMesh &&  !reflectedMesh.Contains(mesh))
                     mesh.render();
+                
             }
 
             //Renderizar mesh de luz

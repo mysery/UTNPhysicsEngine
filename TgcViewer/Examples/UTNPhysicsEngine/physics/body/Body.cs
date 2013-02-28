@@ -43,6 +43,7 @@ namespace Examples.UTNPhysicsEngine.physics.body
         /* Fuerzas */
         public Vector3 aceleracion; // F = momentum //independiente de la rotacion. P
         public Vector3 torque; //tao = angularMomentum //independiente de la traslacion. L
+        public Vector3 externalForce; //se suma a la aceleracion.
         
         public Body(Vector3 position, Vector3 velocity, Vector3 aceleracion, float mass, bool applyGravity = true)
         {
@@ -56,6 +57,7 @@ namespace Examples.UTNPhysicsEngine.physics.body
             this.velocity = velocity;
             this.angularVelocity = Vector3.Empty;
             this.aceleracion = aceleracion;
+            this.externalForce = Vector3.Empty;
             this.torque = Vector3.Empty;
             this.mass = mass;
             this.invMass = mass != 0f ? 1.0f / mass : 0.0f;
@@ -87,7 +89,7 @@ namespace Examples.UTNPhysicsEngine.physics.body
 
         internal void integrateForceSI(float timeStep)
         {   //Aproximado por euler expli.
-            this.velocity.Add(Vector3.Multiply(this.aceleracion, InverseMass * timeStep));            
+            this.velocity.Add(Vector3.Multiply(this.aceleracion + this.externalForce, InverseMass * timeStep));
             Matrix rotation = Matrix.RotationQuaternion(quaternion);
             this.invInertiaTensor = rotation * InvIbody * Matrix.TransposeMatrix(rotation);
             this.angularVelocity.Add(Vector3.TransformNormal(this.torque, this.invInertiaTensor) * timeStep);

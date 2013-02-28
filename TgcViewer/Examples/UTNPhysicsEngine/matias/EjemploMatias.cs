@@ -24,6 +24,7 @@ namespace Examples.UTNPhysicsEngine.matias
 
         //Cancha de basket: 28.65m by 15.24m
         private readonly Vector3 WORLD_EXTENTS = new Vector3(20, 20, 25);
+        private readonly Vector3 VIENTO = new Vector3(2f, 0f, 0f);
 
         private World world;
         private TgcBoundingBox limitsWorld;
@@ -220,9 +221,11 @@ namespace Examples.UTNPhysicsEngine.matias
 
 
             //Modifiers
-            GuiController.Instance.Modifiers.addInterval("objeto", new string[] { "Basket", "Tenis", "Futbol" }, 0);
-            GuiController.Instance.Modifiers.addInterval("cantidad", new string[] { "1", "2", "3", "4", "5"}, 0);
-            GuiController.Instance.Modifiers.addBoolean("cajon", "cajon", true);
+            GuiController.Instance.Modifiers.addInterval("Pelota", new string[] { "Basket", "Tenis", "Futbol" }, 0);
+            GuiController.Instance.Modifiers.addInterval("Cantidad", new string[] { "1", "2", "3", "4", "5"}, 0);
+            GuiController.Instance.Modifiers.addBoolean("Tapa de Cajon", "Tapa de Cajon", true);
+            GuiController.Instance.Modifiers.addBoolean("Aplicar Viento", "Aplicar Viento", false);
+            GuiController.Instance.Modifiers.addBoolean("Aplicar Anti-Gravedad", "Aplicar Anti-Gravedad", false);            
 
             //Variables.
             GuiController.Instance.UserVars.addVar(Constant.objectCount);
@@ -246,12 +249,14 @@ namespace Examples.UTNPhysicsEngine.matias
             GuiController.Instance.D3dDevice.RenderState.StencilEnable = true;
             GuiController.Instance.D3dDevice.RenderState.ReferenceStencil = 1;
             GuiController.Instance.D3dDevice.RenderState.ZBufferWriteEnable = false;
+            GuiController.Instance.D3dDevice.RenderState.CullMode = Cull.Clockwise;
             pisoMesh.render();
+            GuiController.Instance.D3dDevice.RenderState.CullMode = Cull.None;
 
             GuiController.Instance.D3dDevice.RenderState.StencilPass = StencilOperation.Keep;
             GuiController.Instance.D3dDevice.RenderState.StencilFunction = Compare.Equal;
 
-            bool cajon = (bool)GuiController.Instance.Modifiers["cajon"];
+            bool cajon = (bool)GuiController.Instance.Modifiers["Tapa de Cajon"];
             if (cajon)
             {
                 GuiController.Instance.D3dDevice.RenderState.ZBufferWriteEnable = true;
@@ -260,7 +265,9 @@ namespace Examples.UTNPhysicsEngine.matias
                 tapaMovilMesh.AlphaBlendEnable = true;
                 tapaMovilMesh.ZbufferDisable = false;
                 tapaMovilMesh.Effect.Technique = "DIFFUSE_MAP";
+                GuiController.Instance.D3dDevice.RenderState.CullMode = Cull.Clockwise;
                 tapaMovilMesh.render();
+                GuiController.Instance.D3dDevice.RenderState.CullMode = Cull.None;
                 tapaMovilMesh.AlphaBlendEnable = false;
                 tapaMovilMesh.ZbufferDisable = false;
             }
@@ -283,7 +290,7 @@ namespace Examples.UTNPhysicsEngine.matias
                 sphereElement.type.mesh.ZbufferDisable = false;
             }
             
-            GuiController.Instance.D3dDevice.Clear(ClearFlags.ZBuffer, 0, 1f, 0);
+            //GuiController.Instance.D3dDevice.Clear(ClearFlags.ZBuffer, 0, 1f, 0);
             
             GuiController.Instance.D3dDevice.RenderState.StencilEnable = false;
 
@@ -293,9 +300,6 @@ namespace Examples.UTNPhysicsEngine.matias
             pisoMesh.render();
             GuiController.Instance.D3dDevice.RenderState.ColorWriteEnable = col;
             
-
-            //Dibujar/Quitar tapa movil
-            //bool cajon = (bool)GuiController.Instance.Modifiers["cajon"];
             if (cajon)
             {
                 if (!tapaMovilMesh.Enabled)
@@ -346,6 +350,26 @@ namespace Examples.UTNPhysicsEngine.matias
                 //Render mesh
                 sphereElement.type.mesh.Effect.Technique = "DIFFUSE_MAP";
                 sphereElement.type.mesh.render();
+
+                //Aplica una fuerza de viento.
+                if ((bool)GuiController.Instance.Modifiers["Aplicar Viento"])
+                {
+                    sphereElement.body.externalForce = VIENTO;
+                }
+                
+                //Aplica una fuerza anti gravedad.
+                if ((bool)GuiController.Instance.Modifiers["Aplicar Anti-Gravedad"])
+                {
+                    if (!(bool)GuiController.Instance.Modifiers["Aplicar Viento"])
+                        sphereElement.body.externalForce = sphereElement.body.aceleracion*-1f; //Solo aplica gravedad
+                    else
+                        sphereElement.body.externalForce = sphereElement.body.aceleracion * -1f + VIENTO; // aplica gravedad y viendo 
+                }
+                else
+                {
+                    if (!(bool)GuiController.Instance.Modifiers["Aplicar Viento"])
+                        sphereElement.body.externalForce = Vector3.Empty;
+                }
             }
 
 
@@ -385,14 +409,14 @@ namespace Examples.UTNPhysicsEngine.matias
             Vector3 cameraLookAt = camera.getLookAt();
 
             //Tipo de esfera
-            string tipoObjeto = (string)GuiController.Instance.Modifiers["objeto"];
+            string tipoObjeto = (string)GuiController.Instance.Modifiers["Pelota"];
             SphereType sphereType;
             if (tipoObjeto == "Basket") sphereType = sphereTypes[0];
             else if (tipoObjeto == "Tenis") sphereType = sphereTypes[1];
             else sphereType = sphereTypes[2];
 
             //Crear n esferas
-            int cantidad = int.Parse((string)GuiController.Instance.Modifiers["cantidad"]);
+            int cantidad = int.Parse((string)GuiController.Instance.Modifiers["Cantidad"]);
             for (int i = 0; i < cantidad; i++)
             {
                 //Crear elemento de esfera

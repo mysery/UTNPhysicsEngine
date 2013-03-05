@@ -377,7 +377,7 @@ namespace Examples.UTNPhysicsEngine.matias
             //Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
             effectSphere.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
             effectSphere.SetValue("materialAmbientColor", ColorValue.FromColor(Color.White));
-            effectSphere.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.FromArgb(110, Color.White)));
+            effectSphere.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.FromArgb(32, Color.White)));
             effectSphere.SetValue("materialSpecularColor", ColorValue.FromColor(Color.White));
             effectSphere.SetValue("materialSpecularExp", 20f);
 

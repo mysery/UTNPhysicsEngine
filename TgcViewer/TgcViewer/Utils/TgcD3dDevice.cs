@@ -134,7 +134,7 @@ namespace TgcViewer.Utils
             //Alpha Blending
             d3dDevice.RenderState.AlphaBlendEnable = false;
             d3dDevice.RenderState.AlphaTestEnable = false;
-            d3dDevice.RenderState.ReferenceAlpha = 100;
+            d3dDevice.RenderState.ReferenceAlpha = 10;
             d3dDevice.RenderState.AlphaFunction = Compare.Greater;
             d3dDevice.RenderState.BlendOperation = BlendOperation.Add;
             d3dDevice.RenderState.SourceBlend = Blend.SourceAlpha;

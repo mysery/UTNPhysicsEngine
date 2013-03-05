@@ -80,14 +80,14 @@ namespace Examples
             GuiController.Instance.Modifiers.addBoolean(Constant.pause, Constant.pause_text, true);
             GuiController.Instance.Modifiers.addBoolean(Constant.debug, Constant.debug_text, false);
             GuiController.Instance.Modifiers.addFloat(Constant.timeSteps ,0.25f, 10f, 1f);
-            GuiController.Instance.Modifiers.addBoolean(Constant.rayImpulse, Constant.rayImpulse_text, true);
-            GuiController.Instance.Modifiers.addBoolean(Constant.addMode, Constant.addMode_text, false);
+            GuiController.Instance.Modifiers.addBoolean(Constant.rayImpulse, Constant.rayImpulse_text, false);
+            GuiController.Instance.Modifiers.addBoolean(Constant.addMode, Constant.addMode_text, true);
             GuiController.Instance.Modifiers.addFloat(Constant.radio, 1f, 100f, 20f);
             GuiController.Instance.Modifiers.addFloat(Constant.initVel, 0f, 200f, 50f);
-            GuiController.Instance.Modifiers.addBoolean(Constant.gravity, Constant.gravity_text, true);
+            GuiController.Instance.Modifiers.addBoolean(Constant.gravity, Constant.gravity_text, false);
             GuiController.Instance.Modifiers.addVertex3f(Constant.acceleration, new Vector3(-10f, -10f, -10f), new Vector3(10f, 10f, 10f), new Vector3());
             GuiController.Instance.Modifiers.addFloat(Constant.mass, 0f, 10f, 1f);
-            GuiController.Instance.Modifiers.addFloat(Constant.restitution, 0.1f, 1f, 1f);
+            GuiController.Instance.Modifiers.addFloat(Constant.restitution, 0.1f, 1f, 0.8f);
             GuiController.Instance.UserVars.addVar(Constant.objectCount);
             GuiController.Instance.UserVars.addVar(Constant.contactCount);
             //Materials.

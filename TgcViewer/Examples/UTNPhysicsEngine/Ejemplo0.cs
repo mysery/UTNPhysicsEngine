@@ -54,7 +54,7 @@ namespace Examples
         {
             proto.init();
             this.createBodys();
-            proto.optimize();
+            proto.optimize();            
         }
 
         public override void close()
